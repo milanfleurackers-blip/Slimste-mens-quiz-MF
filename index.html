@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Slimste Mens — Quiz Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-light:#E8C96A;--gold-pale:#F5E9C4;--gold-dark:#8B6914;
+  --navy:#1a0000;--navy-mid:#2a0500;--navy-card:#3a0a00;--navy-hover:#4a1000;
+  --cream:#FAF6EE;--cream-dim:#C8BFA8;--muted:#8A6A6A;
+  --red:#C0392B;--green:#1A7A4A;--blue:#1A5276;
+  --border:rgba(201,168,76,0.2);--border-bright:rgba(201,168,76,0.5);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Playfair Display',serif}
+
+/* HEADER */
+header{background:var(--navy-mid);border-bottom:2px solid var(--gold);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.4rem;color:var(--gold);cursor:pointer}
+.logo small{display:block;font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:300;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+.header-btns{display:flex;gap:0.5rem}
+
+/* BUTTONS */
+.btn{font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;border:none;cursor:pointer;padding:0.5rem 1.1rem;border-radius:4px;transition:all 0.15s;letter-spacing:0.02em;white-space:nowrap}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;color:var(--gold);border:1.5px solid var(--gold)}
+.btn-outline:hover{background:rgba(201,168,76,0.1)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid rgba(255,255,255,0.1)}
+.btn-ghost:hover{color:var(--cream);border-color:rgba(255,255,255,0.25)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{filter:brightness(1.2)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{filter:brightness(1.2)}
+.btn-sm{padding:0.35rem 0.75rem;font-size:0.75rem}
+.btn-lg{padding:0.75rem 2rem;font-size:1rem}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* HOME */
+.home-hero{text-align:center;padding:4rem 2rem 3rem;background:radial-gradient(ellipse at 50% 0%,rgba(180,0,0,0.25) 0%,transparent 65%)}
+.home-hero h1{font-size:clamp(2rem,5vw,3.5rem);color:var(--gold);line-height:1.1;margin-bottom:0.5rem}
+.home-hero p{color:var(--cream-dim);font-size:1rem;font-weight:300;margin-bottom:2.5rem;max-width:500px;margin-left:auto;margin-right:auto}
+.home-cards{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:700px;margin:0 auto 3rem;padding:0 1.5rem}
+.home-card{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:2rem;cursor:pointer;transition:all 0.2s}
+.home-card:hover{border-color:var(--gold);background:var(--navy-hover);transform:translateY(-2px)}
+.home-card-icon{font-size:2.5rem;margin-bottom:1rem}
+.home-card h2{font-size:1.2rem;color:var(--gold);margin-bottom:0.5rem}
+.home-card p{font-size:0.85rem;color:var(--cream-dim);font-weight:300;line-height:1.6}
+
+/* BUILDER */
+.builder-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.builder-sidebar{background:#200500;border-right:1px solid var(--border);padding:1.5rem 1rem;overflow-y:auto}
+.builder-sidebar h3{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;padding-left:0.5rem}
+.round-nav-item{display:block;width:100%;text-align:left;background:none;border:none;color:var(--cream-dim);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:0.6rem 0.75rem;border-radius:6px;cursor:pointer;transition:all 0.15s;margin-bottom:0.25rem}
+.round-nav-item:hover{background:var(--navy-hover);color:var(--cream)}
+.round-nav-item.active{background:rgba(201,168,76,0.15);color:var(--gold);font-weight:500}
+.round-nav-item .round-badge{font-size:0.65rem;background:var(--navy-hover);color:var(--muted);padding:0.15rem 0.4rem;border-radius:3px;float:right;margin-top:2px}
+.round-nav-item.active .round-badge{background:rgba(201,168,76,0.2);color:var(--gold)}
+
+.builder-content{padding:2rem;overflow-y:auto;max-height:calc(100vh - 60px)}
+.builder-section-title{font-size:1.5rem;color:var(--gold);margin-bottom:0.25rem}
+.builder-section-sub{font-size:0.85rem;color:var(--muted);margin-bottom:2rem;font-weight:300}
+
+/* FORMS */
+.form-group{margin-bottom:1.25rem}
+.form-label{display:block;font-size:0.78rem;font-weight:500;color:var(--cream-dim);margin-bottom:0.4rem;letter-spacing:0.04em}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--navy-mid);border:1px solid var(--border);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:0.6rem 0.85rem;border-radius:6px;outline:none;transition:border-color 0.15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-select option{background:var(--navy-mid)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-hint{font-size:0.72rem;color:var(--muted);margin-top:0.3rem}
+
+/* QUESTION CARDS */
+.question-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}
+.question-card{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.question-card-header{display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;cursor:pointer;transition:background 0.15s}
+.question-card-header:hover{background:var(--navy-hover)}
+.question-card-num{width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.15);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;color:var(--gold);flex-shrink:0}
+.question-card-title{flex:1;font-size:0.85rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.question-card-badges{display:flex;gap:0.4rem;flex-shrink:0}
+.badge{font-size:0.65rem;padding:0.2rem 0.5rem;border-radius:3px;font-weight:500}
+.badge-point{background:rgba(201,168,76,0.2);color:var(--gold)}
+.badge-media{background:rgba(26,122,74,0.25);color:#4ade80}
+.badge-listen{background:rgba(26,82,118,0.3);color:#60a5fa}
+.question-card-body{border-top:1px solid var(--border);padding:1rem;display:none}
+.question-card-body.open{display:block}
+.question-card-actions{display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border)}
+
+/* ANSWER GRID for open-deur etc */
+.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem}
+.puzzle-grid-builder{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-top:0.5rem}
+
+/* PLAYER SETUP */
+.player-setup{max-width:600px;margin:0 auto;padding:3rem 1.5rem}
+.player-setup h2{font-size:1.8rem;color:var(--gold);margin-bottom:0.5rem;text-align:center}
+.player-setup p{text-align:center;color:var(--cream-dim);font-size:0.9rem;margin-bottom:2.5rem;font-weight:300}
+.player-inputs{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem}
+.player-input-row{display:flex;align-items:center;gap:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1.25rem}
+.player-color{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+
+/* GAME VIEW */
+.game-view{min-height:100vh;display:flex;flex-direction:column}
+.game-header{background:var(--navy-mid);border-bottom:2px solid var(--gold);padding:0.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.game-round-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold)}
+.player-scores{display:flex;gap:1.5rem}
+.player-score{text-align:center;min-width:80px}
+.player-score-name{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.2rem}
+.player-score-time{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;line-height:1;color:var(--gold)}
+.player-score-time.active{color:var(--gold)}
+.player-score-time.losing{color:var(--red)}
+
+/* GAME MAIN */
+.game-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:2rem 1.5rem;max-width:900px;width:100%;margin:0 auto}
+.game-question-box{background:var(--navy-card);border:1px solid var(--border-bright);border-radius:12px;padding:2rem;width:100%;margin-bottom:1.5rem;text-align:center}
+.game-question-number{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem}
+.game-question-text{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream);line-height:1.4;margin-bottom:1rem}
+.game-question-media{margin:1rem 0}
+.game-question-media img{max-width:100%;max-height:300px;border-radius:8px;display:block;margin:0 auto}
+.game-question-media iframe{width:100%;height:280px;border-radius:8px;border:none;display:block}
+.game-question-media audio{width:100%;margin:0.5rem 0}
+.game-question-media video{width:100%;border-radius:8px;display:block}
+
+/* ANSWER REVEAL */
+.answers-panel{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem}
+.answer-slot{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.75rem;transition:all 0.3s}
+.answer-slot.revealed{border-color:var(--green);background:rgba(26,122,74,0.15)}
+.answer-slot.wrong{border-color:var(--red);background:rgba(192,57,43,0.1)}
+.answer-slot-num{width:26px;height:26px;border-radius:50%;background:var(--navy-hover);color:var(--muted);font-size:0.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.answer-slot.revealed .answer-slot-num{background:var(--green);color:#fff}
+.answer-slot-text{font-size:0.9rem;color:var(--cream-dim)}
+.answer-slot.revealed .answer-slot-text{color:var(--cream);font-weight:500}
+
+/* PUZZLE GRID */
+.puzzle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;width:100%}
+.puzzle-cell{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center;font-size:0.88rem;color:var(--cream-dim);cursor:pointer;transition:all 0.2s;min-height:70px;display:flex;align-items:center;justify-content:center}
+.puzzle-cell:hover{border-color:var(--gold);color:var(--cream)}
+.puzzle-cell.selected{border-color:var(--gold);background:rgba(201,168,76,0.12);color:var(--gold)}
+.puzzle-cell.matched{border-color:var(--green);background:rgba(26,122,74,0.2);color:#4ade80;cursor:default}
+
+/* GALLERY */
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;width:100%;margin-bottom:1rem}
+.gallery-item{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted);position:relative;cursor:pointer}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0}
+.gallery-item.revealed{border-color:var(--border-bright)}
+
+/* GAME CONTROLS */
+.game-controls{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem}
+.active-player-banner{background:rgba(201,168,76,0.1);border:1px solid var(--border);border-radius:8px;padding:0.6rem 1.25rem;font-size:0.85rem;color:var(--cream-dim);margin-bottom:1rem;text-align:center}
+.active-player-banner strong{color:var(--gold)}
+
+/* TIMER DISPLAY */
+.timer-big{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--gold);text-align:center;margin:0.5rem 0}
+.timer-big.warning{color:#F39C12;animation:pulse 0.5s ease-in-out infinite alternate}
+.timer-big.danger{color:var(--red);animation:pulse 0.3s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:0.6}}
+
+/* FINALE */
+.finale-question{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);text-align:center;margin-bottom:1.5rem;line-height:1.3}
+
+/* SCORE BOARD */
+.scoreboard{background:var(--navy-card);border:1px solid var(--border-bright);border-radius:12px;padding:2rem;width:100%;max-width:500px;margin:0 auto}
+.scoreboard h2{font-size:1.6rem;color:var(--gold);text-align:center;margin-bottom:1.5rem}
+.score-row{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.score-row:last-child{border-bottom:none}
+.score-rank{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;width:40px;color:var(--muted)}
+.score-rank.gold{color:var(--gold)}
+.score-rank.silver{color:#a8b2be}
+.score-rank.bronze{color:#cd7f32}
+.score-name{flex:1;font-size:1rem;font-weight:500}
+.score-secs{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold)}
+
+/* TOAST */
+.toast{position:fixed;top:80px;right:1.5rem;background:var(--navy-card);border:1px solid var(--border-bright);border-radius:8px;padding:0.85rem 1.25rem;font-size:0.85rem;color:var(--cream);z-index:999;transform:translateX(150%);transition:transform 0.3s;max-width:300px}
+.toast.show{transform:translateX(0)}
+.toast.toast-success{border-color:var(--green);color:#4ade80}
+.toast.toast-error{border-color:var(--red);color:#f87171}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;display:none}
+.modal-overlay.open{display:flex}
+.modal{background:var(--navy-mid);border:1px solid var(--border-bright);border-radius:12px;padding:2rem;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:1.3rem;color:var(--gold);margin-bottom:1.25rem}
+.modal-actions{display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+/* SAVED QUIZZES */
+.saved-list{display:flex;flex-direction:column;gap:0.75rem}
+.saved-item{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem}
+.saved-item-info{flex:1}
+.saved-item-name{font-weight:500;margin-bottom:0.2rem}
+.saved-item-meta{font-size:0.75rem;color:var(--muted)}
+.saved-item-actions{display:flex;gap:0.5rem}
+
+/* THEME SELECTOR */
+.theme-picker{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem}
+.theme-chip{padding:0.4rem 0.85rem;border-radius:20px;border:1.5px solid var(--border);color:var(--muted);font-size:0.78rem;cursor:pointer;transition:all 0.15s;background:transparent}
+.theme-chip:hover{border-color:var(--gold);color:var(--cream)}
+.theme-chip.selected{border-color:var(--gold);background:rgba(201,168,76,0.15);color:var(--gold)}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .builder-layout{grid-template-columns:1fr}
+  .builder-sidebar{display:none}
+  .home-cards{grid-template-columns:1fr}
+  .answers-panel{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .puzzle-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+}
+
+/* ROUND COLORS */
+.ronde-1{border-left:3px solid #E74C3C}
+.ronde-2{border-left:3px solid #E67E22}
+.ronde-3{border-left:3px solid #F1C40F}
+.ronde-4{border-left:3px solid #2ECC71}
+.ronde-5{border-left:3px solid #3498DB}
+.ronde-finale{border-left:3px solid var(--gold)}
+
+.section-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;gap:1rem;flex-wrap:wrap}
+.section-header-text{}
+.add-btn-wrap{flex-shrink:0;margin-top:0.25rem}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: Load Quiz -->
+<div class="modal-overlay" id="modalLoad">
+  <div class="modal">
+    <h3>Quiz laden</h3>
+    <div class="saved-list" id="savedQuizList"></div>
+    <div id="modalImportWrap" style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem">Of importeer een quiz vanaf je computer (.json bestand):</p>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFileModal').click()">⬆ .json bestand importeren</button>
+      <input type="file" id="importFileModal" accept=".json" style="display:none" onchange="importQuiz(event);closeModal('modalLoad')">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalLoad')">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirm delete -->
+<div class="modal-overlay" id="modalConfirm">
+  <div class="modal">
+    <h3 id="confirmTitle">Weet je het zeker?</h3>
+    <p id="confirmMsg" style="color:var(--cream-dim);font-size:0.9rem;margin-bottom:0.5rem"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalConfirm')">Annuleren</button>
+      <button class="btn btn-danger" id="confirmBtn">Verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ HOME ═══ -->
+<div class="page active" id="pageHome">
+  <header>
+    <div class="logo">De Slimste Mens<small>Quiz Builder v2.5</small></div>
+    <div class="header-btns">
+      <button class="btn btn-ghost btn-sm" onclick="showLoadModal()">📂 Quiz laden</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆ Importeren</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importQuiz(event)">
+    </div>
+  </header>
+  <div class="home-hero">
+    <h1>De Slimste Mens<br>ter Wereld</h1>
+    <p>Bouw je eigen quiz met alle klassieke rondes. Sla op, laad en speel — rechtstreeks in je browser.</p>
+  </div>
+  <div class="home-cards">
+    <div class="home-card" onclick="startNewQuiz()">
+      <div class="home-card-icon">🏗️</div>
+      <h2>Nieuwe quiz bouwen</h2>
+      <p>Maak een volledige quiz met 6 rondes. Voeg vragen toe met tekst, foto's en video's.</p>
+    </div>
+    <div class="home-card" onclick="showLoadModal(true)">
+      <div class="home-card-icon">▶️</div>
+      <h2>Quiz spelen</h2>
+      <p>Laad een eerder gemaakte quiz en speel hem met 3 kandidaten.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ BUILDER ═══ -->
+<div class="page" id="pageBuilder">
+  <header>
+    <div class="logo" onclick="goHome()" style="cursor:pointer">De Slimste Mens<small>Quiz Builder v2.5</small></div>
+    <div class="header-btns">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Terug</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportQuiz()">⬇ Exporteren</button>
+      <button class="btn btn-outline btn-sm" onclick="saveQuiz()">💾 Opslaan</button>
+      <button class="btn btn-gold btn-sm" onclick="startGameSetup()">▶ Spelen</button>
+    </div>
+  </header>
+  <div class="builder-layout">
+    <nav class="builder-sidebar">
+      <h3>Rondes</h3>
+      <button class="round-nav-item active" onclick="showRound(0)" id="nav0">⚙️ Quiz info</button>
+      <button class="round-nav-item ronde-1" onclick="showRound(1)" id="nav1">Ronde 1 · 3-6-9 <span class="round-badge" id="badge1">0</span></button>
+      <button class="round-nav-item ronde-2" onclick="showRound(2)" id="nav2">Ronde 2 · Open Deur <span class="round-badge" id="badge2">0</span></button>
+      <button class="round-nav-item ronde-3" onclick="showRound(3)" id="nav3">Ronde 3 · Puzzel <span class="round-badge" id="badge3">0</span></button>
+      <button class="round-nav-item ronde-4" onclick="showRound(4)" id="nav4">Ronde 4 · Galerij <span class="round-badge" id="badge4">0</span></button>
+      <button class="round-nav-item ronde-5" onclick="showRound(5)" id="nav5">Ronde 5 · Collectief <span class="round-badge" id="badge5">0</span></button>
+      <button class="round-nav-item ronde-finale" onclick="showRound(6)" id="nav6">Finale <span class="round-badge" id="badge6">0</span></button>
+    </nav>
+    <div class="builder-content" id="builderContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ PLAYER SETUP ═══ -->
+<div class="page" id="pageSetup">
+  <header>
+    <div class="logo">De Slimste Mens<small>Speler Setup</small></div>
+    <div class="header-btns">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('pageBuilder')">← Terug</button>
+    </div>
+  </header>
+  <div class="player-setup">
+    <h2>Kandidaten</h2>
+    <p>Voer de namen in van de drie kandidaten. De nieuwkomer begint als eerste.</p>
+    <div class="player-inputs">
+      <div class="player-input-row">
+        <div class="player-color" style="background:#E74C3C"></div>
+        <div style="flex:1">
+          <div class="form-label">Kandidaat 1 (nieuwkomer)</div>
+          <input class="form-input" id="pName0" placeholder="Naam" value="">
+        </div>
+      </div>
+      <div class="player-input-row">
+        <div class="player-color" style="background:#3498DB"></div>
+        <div style="flex:1">
+          <div class="form-label">Kandidaat 2</div>
+          <input class="form-input" id="pName1" placeholder="Naam" value="">
+        </div>
+      </div>
+      <div class="player-input-row">
+        <div class="player-color" style="background:#2ECC71"></div>
+        <div style="flex:1">
+          <div class="form-label">Kandidaat 3</div>
+          <input class="form-input" id="pName2" placeholder="Naam" value="">
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-gold btn-lg" style="width:100%" onclick="startGame()">▶ Start de quiz!</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ GAME ═══ -->
+<div class="page" id="pageGame">
+  <!-- dynamic content rendered by JS -->
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const COLORS = ['#E74C3C','#3498DB','#2ECC71'];
+const ROUND_NAMES = ['','3-6-9','Open Deur','Puzzel','Galerij','Collectief Geheugen','Finale'];
+
+let quiz = createEmptyQuiz();
+let currentRound = 0;
+let game = null; // game state
+
+function createEmptyQuiz(){
+  return {
+    name: 'Mijn Quiz',
+    r1: Array.from({length:15},(_,i)=>({text:'',isListen:false,audioUrl:'',points:([2,5,8,11,14].includes(i))})),
+    r2: Array.from({length:6},()=>({theme:'',answers:['','','','']})),
+    r3: Array.from({length:3},()=>({answers:[{clue:'',solution:'',clues:['','','','']},{clue:'',solution:'',clues:['','','','']},{clue:'',solution:'',clues:['','','','']}]})),
+    r4: Array.from({length:3},()=>({theme:'',images:['','','','','','','',''],answers:['','','','','','','','']})),
+    r5: Array.from({length:3},()=>({theme:'',videoUrl:'',answers:['','','','','']})),
+    finale: Array.from({length:8},()=>({question:'',answers:['','','','','']})),
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){if(confirm('Terug naar home? Niet-opgeslagen wijzigingen gaan verloren.'))showPage('pageHome')}
+function startNewQuiz(){quiz=createEmptyQuiz();showPage('pageBuilder');showRound(0)}
+
+// ═══════════════════════════════════════════════════════
+//  BUILDER
+// ═══════════════════════════════════════════════════════
+let activeRound = 0;
+function showRound(r){
+  activeRound = r;
+  document.querySelectorAll('.round-nav-item').forEach((el,i)=>el.classList.toggle('active',i===r));
+  renderBuilderContent();
+}
+
+function renderBuilderContent(){
+  const el = document.getElementById('builderContent');
+  if(activeRound===0) el.innerHTML = renderInfo();
+  else if(activeRound===1) el.innerHTML = renderR1();
+  else if(activeRound===2) el.innerHTML = renderR2();
+  else if(activeRound===3) el.innerHTML = renderR3();
+  else if(activeRound===4) el.innerHTML = renderR4();
+  else if(activeRound===5) el.innerHTML = renderR5();
+  else if(activeRound===6) el.innerHTML = renderFinale();
+  updateBadges();
+}
+
+function renderInfo(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Quiz informatie</h2>
+    <p class="builder-section-sub">Geef je quiz een naam.</p>
+  </div></div>
+  <div class="form-group" style="max-width:400px">
+    <label class="form-label">Naam van de quiz</label>
+    <input class="form-input" value="${esc(quiz.name)}" oninput="quiz.name=this.value" placeholder="Bijv. Familiefeest Quiz 2024">
+  </div>
+  <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:1.25rem;max-width:500px;margin-top:1.5rem">
+    <h3 style="font-size:1rem;color:var(--gold);margin-bottom:0.75rem">Overzicht rondes</h3>
+    ${[1,2,3,4,5,6].map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.85rem">
+      <span style="color:var(--cream-dim)">Ronde ${r===6?'Finale':r} · ${ROUND_NAMES[r]||'Finale'}</span>
+      <span style="color:var(--gold)" id="ov${r}"></span>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderR1(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Ronde 1 · 3-6-9</h2>
+    <p class="builder-section-sub">15 vragen · punten op vraag 3,6,9,12,15 · één luistervraag · max 60 sec startkapitaal</p>
+  </div></div>
+  <div class="question-list">${quiz.r1.map((q,i)=>renderR1Card(q,i)).join('')}</div>`;
+}
+
+function renderR1Card(q,i){
+  const isPt = q.points;
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('r1c${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.text||'<em style="color:var(--muted)">Nog geen vraag</em>'}</div>
+      <div class="question-card-badges">
+        ${isPt?'<span class="badge badge-point">+10s</span>':''}
+        ${q.isListen?'<span class="badge badge-listen">🎵 Luister</span>':''}
+        ${q.imageUrl?'<span class="badge badge-media">📷</span>':''}
+      </div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="r1c${i}">
+      <div class="form-group">
+        <label class="form-label">Vraag</label>
+        <input class="form-input" value="${esc(q.text)}" oninput="quiz.r1[${i}].text=this.value;updateBadges()" placeholder="Typ de vraag...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Antwoord</label>
+        <input class="form-input" value="${esc(q.answer||'')}" oninput="quiz.r1[${i}].answer=this.value" placeholder="Correct antwoord">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Afbeelding (optioneel)</label>
+          <input class="form-input" value="${q.imageUrl&&q.imageUrl.startsWith('data:')?'(afbeelding geüpload)':esc(q.imageUrl||'')}" oninput="if(!this.value){quiz.r1[${i}].imageUrl='';}" placeholder="URL of upload →">
+          <label style="display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.72rem;color:var(--gold);margin-top:0.3rem">
+            📁 Afbeelding uploaden
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImageTo('r1','imageUrl',${i},0,this)">
+          </label>
+          ${q.imageUrl?`<div style="margin-top:0.4rem"><img src="${q.imageUrl}" style="max-height:60px;border-radius:4px;border:1px solid var(--border)"></div>`:''}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Audio/Video URL (optioneel)</label>
+          <input class="form-input" value="${esc(q.audioUrl||'')}" oninput="quiz.r1[${i}].audioUrl=this.value" placeholder="YouTube link of audio URL">
+        </div>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.85rem;color:var(--cream-dim)">
+          <input type="checkbox" ${q.isListen?'checked':''} onchange="quiz.r1[${i}].isListen=this.checked;renderBuilderContent()"> Dit is de luistervraag
+        </label>
+      </div>
+      ${isPt?`<div style="background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.85rem;font-size:0.78rem;color:var(--gold)">★ Puntenvraag — deelnemers kunnen +10 seconden verdienen</div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderR2(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Ronde 2 · Open Deur</h2>
+    <p class="builder-section-sub">6 thema's · 4 antwoorden elk · +20s per goed antwoord · elke kandidaat kiest 2x</p>
+  </div></div>
+  <div class="question-list">${quiz.r2.map((q,i)=>renderR2Card(q,i)).join('')}</div>`;
+}
+
+function renderR2Card(q,i){
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('r2c${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.theme||'<em style="color:var(--muted)">Thema nog niet ingevuld</em>'}</div>
+      <div class="question-card-badges"><span class="badge badge-point">4×+20s</span></div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="r2c${i}">
+      <div class="form-group">
+        <label class="form-label">Thema</label>
+        <input class="form-input" value="${esc(q.theme)}" oninput="quiz.r2[${i}].theme=this.value;updateBadges()" placeholder="Bijv. Vlaamse zangers">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Afbeelding bij thema (optioneel)</label>
+        <input class="form-input" value="${q.imageUrl&&q.imageUrl.startsWith('data:')?'(afbeelding geüpload)':esc(q.imageUrl||'')}" oninput="if(!this.value){quiz.r2[${i}].imageUrl='';}" placeholder="URL of upload →">
+        <label style="display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.72rem;color:var(--gold);margin-top:0.3rem">
+          📁 Afbeelding uploaden
+          <input type="file" accept="image/*" style="display:none" onchange="uploadImageTo('r2','imageUrl',${i},0,this)">
+        </label>
+        ${q.imageUrl?`<div style="margin-top:0.4rem"><img src="${q.imageUrl}" style="max-height:60px;border-radius:4px;border:1px solid var(--border)"></div>`:''}
+      </div>
+      <label class="form-label">Vier antwoorden</label>
+      <div class="answer-grid">
+        ${q.answers.map((a,j)=>`<div>
+          <input class="form-input" value="${esc(a)}" oninput="quiz.r2[${i}].answers[${j}]=this.value" placeholder="Antwoord ${j+1}">
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderR3(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Ronde 3 · Puzzel</h2>
+    <p class="builder-section-sub">3 puzzels · 3×4 raster (12 hokjes, 3 groepen van 4) · +30s per goed antwoord</p>
+  </div></div>
+  <div class="question-list">${quiz.r3.map((q,i)=>renderR3Card(q,i)).join('')}</div>`;
+}
+
+function renderR3Card(q,i){
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('r3c${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.answers.some(a=>a.solution)?q.answers.map(a=>a.solution).filter(Boolean).join(' / '):'<em style="color:var(--muted)">Puzzel nog niet ingevuld</em>'}</div>
+      <div class="question-card-badges"><span class="badge badge-point">3×+30s</span></div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="r3c${i}">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Elke groep heeft 4 aanwijzingen die samen één woord omschrijven.</p>
+      ${q.answers.map((ans,j)=>`<div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:0.75rem">
+        <div class="form-row" style="margin-bottom:0.75rem">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Oplossing (woord)</label>
+            <input class="form-input" value="${esc(ans.solution)}" oninput="quiz.r3[${i}].answers[${j}].solution=this.value;updateBadges()" placeholder="Het gezochte woord">
+          </div>
+        </div>
+        <label class="form-label">4 aanwijzingen</label>
+        <div class="puzzle-grid-builder">
+          ${(ans.clues||['','','','']).map((c,k)=>`<input class="form-input" value="${esc(c)}" oninput="quiz.r3[${i}].answers[${j}].clues=${JSON.stringify(ans.clues||['','','',''])};quiz.r3[${i}].answers[${j}].clues[${k}]=this.value" placeholder="Aanwijzing ${k+1}">`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderR4(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Ronde 4 · Galerij</h2>
+    <p class="builder-section-sub">3 galerijen · 8 afbeeldingen per galerij · +15s per goed antwoord</p>
+  </div></div>
+  <div class="question-list">${quiz.r4.map((q,i)=>renderR4Card(q,i)).join('')}</div>`;
+}
+
+function renderR4Card(q,i){
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('r4c${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.theme||'<em style="color:var(--muted)">Thema nog niet ingevuld</em>'}</div>
+      <div class="question-card-badges"><span class="badge badge-media">8 📷</span><span class="badge badge-point">8×+10s</span></div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="r4c${i}">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Overkoepelend thema (ter info)</label>
+          <input class="form-input" value="${esc(q.theme)}" oninput="quiz.r4[${i}].theme=this.value;updateBadges()" placeholder="Bijv. Europese hoofdsteden">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Extra aanwijzing (optioneel)</label>
+          <input class="form-input" value="${esc(q.hint||'')}" oninput="quiz.r4[${i}].hint=this.value" placeholder="Optionele aanwijzing">
+        </div>
+      </div>
+      <label class="form-label">8 foto's — upload of plak een URL</label>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.5rem">
+        ${q.images.map((img,j)=>`<div style="display:grid;grid-template-columns:56px 1fr 1fr;gap:0.5rem;align-items:center">
+          <div style="width:52px;height:52px;border-radius:6px;border:1px solid var(--border);overflow:hidden;background:var(--navy-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            ${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='📷'">`:'<span style="font-size:1.2rem;color:var(--muted)">📷</span>'}
+          </div>
+          <div>
+            <input class="form-input" value="${img&&img.startsWith('data:')?'(afbeelding geüpload)':esc(img)}" oninput="if(!this.value){quiz.r4[${i}].images[${j}]='';renderBuilderContent();}" placeholder="URL of upload →" style="margin-bottom:0.3rem">
+            <label style="display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.72rem;color:var(--gold)">
+              📁 Upload
+              <input type="file" accept="image/*" style="display:none" onchange="uploadImageTo('r4','images',${i},${j},this)">
+            </label>
+          </div>
+          <input class="form-input" value="${esc((q.answers&&q.answers[j])||'')}" oninput="if(!quiz.r4[${i}].answers)quiz.r4[${i}].answers=[];quiz.r4[${i}].answers[${j}]=this.value" placeholder="Antwoord bij foto ${j+1}">
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderR5(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Ronde 5 · Collectief Geheugen</h2>
+    <p class="builder-section-sub">3 fragmenten · 5 antwoorden · oplopende bonus: 10/20/30/40/50s · tussenstand na elk fragment</p>
+  </div></div>
+  <div class="question-list">${quiz.r5.map((q,i)=>renderR5Card(q,i)).join('')}</div>`;
+}
+
+function renderR5Card(q,i){
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('r5c${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.theme||'<em style="color:var(--muted)">Thema nog niet ingevuld</em>'}</div>
+      <div class="question-card-badges"><span class="badge badge-point">10→50s</span></div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="r5c${i}">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Thema / context</label>
+          <input class="form-input" value="${esc(q.theme)}" oninput="quiz.r5[${i}].theme=this.value;updateBadges()" placeholder="Bijv. De film Titanic">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Video URL (YouTube)</label>
+          <input class="form-input" value="${esc(q.videoUrl)}" oninput="quiz.r5[${i}].videoUrl=this.value" placeholder="https://youtube.com/...">
+        </div>
+      </div>
+      <label class="form-label">5 Antwoorden (bonus: 10/20/30/40/50s)</label>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem">
+        ${q.answers.map((a,j)=>`<div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:0.75rem;color:var(--gold);width:32px;text-align:right;flex-shrink:0">+${(j+1)*10}s</span>
+          <input class="form-input" value="${esc(a)}" oninput="quiz.r5[${i}].answers[${j}]=this.value" placeholder="Antwoord ${j+1}">
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFinale(){
+  return `<div class="section-header"><div class="section-header-text">
+    <h2 class="builder-section-title">Finale</h2>
+    <p class="builder-section-sub">8 vragen · "Wat weet je van..." · 5 antwoorden · per goed antwoord -20s bij tegenstander · alleen top 2 spelers</p>
+  </div></div>
+  <div class="question-list">${quiz.finale.map((q,i)=>renderFinaleCard(q,i)).join('')}</div>
+  <button class="btn btn-outline btn-sm" style="margin-top:0.5rem" onclick="quiz.finale.push({question:'',answers:['','','','','']});renderBuilderContent()">+ Vraag toevoegen</button>
+  `;
+}
+
+function renderFinaleCard(q,i){
+  return `<div class="question-card">
+    <div class="question-card-header" onclick="toggleCard('finc${i}')">
+      <div class="question-card-num">${i+1}</div>
+      <div class="question-card-title">${q.question?`Wat weet je van ${q.question}?`:'<em style="color:var(--muted)">Nog geen finalevraag</em>'}</div>
+      <div class="question-card-badges"><span class="badge badge-point">5×-20s</span></div>
+      <span style="color:var(--muted);font-size:0.8rem;margin-left:0.5rem">▾</span>
+    </div>
+    <div class="question-card-body" id="finc${i}">
+      <div class="form-group">
+        <label class="form-label">Wat weet je van...</label>
+        <input class="form-input" value="${esc(q.question)}" oninput="quiz.finale[${i}].question=this.value;updateBadges()" placeholder="Bijv. de Tweede Wereldoorlog">
+      </div>
+      <label class="form-label">5 Antwoorden</label>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem">
+        ${q.answers.map((a,j)=>`<input class="form-input" value="${esc(a)}" oninput="quiz.finale[${i}].answers[${j}]=this.value" placeholder="Antwoord ${j+1}">`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+function updateBadges(){
+  document.getElementById('badge1').textContent = quiz.r1.filter(q=>q.text).length+'/15';
+  document.getElementById('badge2').textContent = quiz.r2.filter(q=>q.theme).length+'/6';
+  document.getElementById('badge3').textContent = quiz.r3.filter(q=>q.answers.some(a=>a.solution)).length+'/3';
+  document.getElementById('badge4').textContent = quiz.r4.filter(q=>q.theme).length+'/3';
+  document.getElementById('badge5').textContent = quiz.r5.filter(q=>q.theme).length+'/3';
+  document.getElementById('badge6').textContent = quiz.finale.filter(q=>q.question).length+'/5';
+  // overview
+  [1,2,3,4,5,6].forEach(r=>{
+    const el = document.getElementById('ov'+r);
+    if(!el) return;
+    const badges = ['badge1','badge2','badge3','badge4','badge5','badge6'];
+    const b = document.getElementById(badges[r-1]);
+    if(b) el.textContent = b.textContent;
+  });
+}
+
+// ── IMAGE UPLOAD (base64) ──
+function uploadImageTo(round, field, idx, subIdx, input){
+  const file = input.files[0];
+  if(!file) return;
+  // Warn if file is large
+  if(file.size > 2*1024*1024){
+    if(!confirm('Deze afbeelding is groter dan 2MB. Grote afbeeldingen maken het JSON-bestand zwaar. Doorgaan?')) return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result; // base64 data URL
+    if(round==='r4') quiz.r4[idx].images[subIdx] = data;
+    else if(round==='r1') quiz.r1[idx].imageUrl = data;
+    else if(round==='r2') quiz.r2[idx].imageUrl = data;
+    renderBuilderContent();
+    toast('Afbeelding geüpload ✓','success');
+  };
+  reader.readAsDataURL(file);
+}
+function saveQuiz(){
+  const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+  const idx = saves.findIndex(s=>s.name===quiz.name);
+  const entry = {name:quiz.name,date:new Date().toLocaleDateString('nl-BE'),data:JSON.stringify(quiz)};
+  if(idx>=0) saves[idx]=entry; else saves.push(entry);
+  localStorage.setItem('slimsteMensQuizzes',JSON.stringify(saves));
+  toast('Quiz opgeslagen: '+quiz.name,'success');
+}
+
+function exportQuiz(){
+  const filename = (quiz.name||'quiz').replace(/[^a-z0-9_\-]/gi,'_')+'.json';
+  const blob = new Blob([JSON.stringify(quiz, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  toast('Quiz geëxporteerd als '+filename,'success');
+}
+
+function importQuiz(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(!imported.r1||!imported.r2) throw new Error('Ongeldig formaat');
+      quiz = imported;
+      // also save to localStorage
+      const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+      const idx = saves.findIndex(s=>s.name===quiz.name);
+      const entry = {name:quiz.name,date:new Date().toLocaleDateString('nl-BE'),data:JSON.stringify(quiz)};
+      if(idx>=0) saves[idx]=entry; else saves.push(entry);
+      localStorage.setItem('slimsteMensQuizzes',JSON.stringify(saves));
+      showPage('pageBuilder');
+      showRound(0);
+      toast('Quiz geïmporteerd: '+quiz.name,'success');
+    } catch(err) {
+      toast('Fout: ongeldig quizbestand','error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function showLoadModal(playMode){
+  const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+  const list = document.getElementById('savedQuizList');
+  if(!saves.length){
+    list.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;text-align:center;padding:1rem">Nog geen opgeslagen quizzen.</p>';
+  } else {
+    list.innerHTML = saves.map((s,i)=>`<div class="saved-item">
+      <div class="saved-item-info">
+        <div class="saved-item-name">${esc(s.name)}</div>
+        <div class="saved-item-meta">Opgeslagen: ${s.date}</div>
+      </div>
+      <div class="saved-item-actions">
+        <button class="btn btn-gold btn-sm" onclick="loadQuiz(${i},${playMode?'true':'false'})">${playMode?'▶ Spelen':'📂 Laden'}</button>
+        <button class="btn btn-outline btn-sm" onclick="exportSaved(${i})" title="Exporteer als .json">⬇</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete(${i})">🗑</button>
+      </div>
+    </div>`).join('');
+  }
+  // import button inside modal
+  document.getElementById('modalImportWrap').style.display='block';
+  openModal('modalLoad');
+}
+
+function loadQuiz(i, playMode){
+  const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+  quiz = JSON.parse(saves[i].data);
+  closeModal('modalLoad');
+  if(playMode){ startGameSetup(); }
+  else { showPage('pageBuilder'); showRound(0); }
+  toast('Quiz geladen: '+quiz.name,'success');
+}
+
+function confirmDelete(i){
+  document.getElementById('confirmMsg').textContent = 'Deze quiz wordt permanent verwijderd.';
+  document.getElementById('confirmBtn').onclick = ()=>{deleteQuiz(i)};
+  openModal('modalConfirm');
+}
+function deleteQuiz(i){
+  const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+  saves.splice(i,1);
+  localStorage.setItem('slimsteMensQuizzes',JSON.stringify(saves));
+  closeModal('modalConfirm');
+  toast('Quiz verwijderd','error');
+  showLoadModal();
+}
+
+function exportSaved(i){
+  const saves = JSON.parse(localStorage.getItem('slimsteMensQuizzes')||'[]');
+  const data = JSON.parse(saves[i].data);
+  const filename = (data.name||'quiz').replace(/[^a-z0-9_\-]/gi,'_')+'.json';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  toast('Geëxporteerd: '+filename,'success');
+}
+// ═══════════════════════════════════════════════════════
+//  GAME ENGINE
+// ═══════════════════════════════════════════════════════
+let projWin = null;
+let timerInterval = null;
+let timerPaused = false;
+
+// ── TIMER ──
+function startTimer(){
+  stopTimer();
+  timerPaused = false;
+  timerInterval = setInterval(()=>{
+    if(timerPaused) return;
+    if(!game||['r1','end','intermission'].includes(game.phase)) return;
+    const cp = getActiveTimerPlayer();
+    if(cp===-1) return;
+    game.players[cp].seconds = Math.max(0, game.players[cp].seconds-1);
+    updateScoreDisplay();
+    updateProjection(null, projScoresHTML(), null);
+    if(game.players[cp].seconds<=0 && game.phase==='finale'){
+      stopTimer(); renderFinaleGame();
+    }
+  }, 1000);
+}
+function stopTimer(){ if(timerInterval){clearInterval(timerInterval);timerInterval=null;} }
+function pauseTimer(){
+  timerPaused=!timerPaused;
+  const btn=document.getElementById('pauseBtn');
+  if(btn) btn.textContent=timerPaused?'▶ Hervat':'⏸ Pauze';
+  if(timerPaused){
+    updateProjection(`<div style="text-align:center;padding:3rem"><div style="font-family:'Playfair Display',serif;font-size:4rem;color:var(--gold)">⏸</div><div style="font-size:1.2rem;color:var(--cream-dim);margin-top:1rem">Pauze</div></div>`,projScoresHTML(),null);
+  } else { renderGameRound(); }
+}
+function getActiveTimerPlayer(){
+  if(game.phase==='r2') return game.r2.currentPlayer;
+  if(game.phase==='r3') return game.r3.currentPlayer;
+  if(game.phase==='r4') return game.r4.currentPlayer;
+  if(game.phase==='r5') return game.r5.currentPlayer;
+  if(game.phase==='finale') return game.finale.currentPlayer;
+  return -1;
+}
+function updateScoreDisplay(){
+  const el=document.getElementById('liveScores');
+  if(el) el.innerHTML=game.players.map((p,i)=>renderPlayerScore(p,i)).join('');
+}
+
+// ── INTERMISSION (tussenscherm) ──
+function showIntermission(nextPhase, nextSetup){
+  stopTimer();
+  timerPaused=false;
+  game._nextPhase=nextPhase;
+  game._nextSetup=nextSetup;
+  const roundNames={r2:'Ronde 2 · Open Deur',r3:'Ronde 3 · Puzzel',r4:'Ronde 4 · Galerij',r5:'Ronde 5 · Collectief Geheugen',finale:'Finale',end:'Eindstand'};
+
+  // If pageGame is not active yet, render it first
+  if(!document.getElementById('gameMain')){
+    showPage('pageGame');
+    const el=document.getElementById('pageGame');
+    el.innerHTML=`
+      <header class="game-header">
+        <div id="roundTitle" class="game-round-title">Pauze</div>
+        <div id="liveScores" class="player-scores">${game.players.map((p,i)=>renderPlayerScore(p,i)).join('')}</div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn btn-ghost btn-sm" style="opacity:0.4" disabled>⏸ Pauze</button>
+          <button class="btn btn-outline btn-sm" onclick="openProjection()">📺 Projectiescherm</button>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quiz stoppen?')){stopTimer();showPage('pageHome')}">✕ Stop</button>
+        </div>
+      </header>
+      <div class="game-main" id="gameMain"></div>`;
+  } else {
+    // just update the title
+    const titleEl=document.getElementById('roundTitle');
+    if(titleEl) titleEl.textContent='Pauze';
+    const scoresEl=document.getElementById('liveScores');
+    if(scoresEl) scoresEl.innerHTML=game.players.map((p,i)=>renderPlayerScore(p,i)).join('');
+  }
+
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div style="text-align:center;padding:3rem 2rem;max-width:500px;margin:0 auto">
+      <div style="font-size:3rem;margin-bottom:1rem">☕</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.5rem">Even pauze</h2>
+      <p style="color:var(--cream-dim);font-weight:300;margin-bottom:2rem">Volgende: <strong style="color:var(--cream)">${roundNames[nextPhase]||nextPhase}</strong></p>
+      <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:2rem">
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Tussenstand</div>
+        ${[...game.players].sort((a,b)=>b.seconds-a.seconds).map((p,i)=>`
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:1.1rem">${['🥇','🥈','🥉'][i]}</span>
+            <span style="flex:1;font-weight:500;color:${p.color}">${esc(p.name)}</span>
+            <span style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold)">${p.seconds}s</span>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-gold btn-lg" onclick="applyNextPhase()">▶ Start ${roundNames[nextPhase]||nextPhase}</button>
+    </div>
+  `;
+  updateProjection(`
+    <div style="text-align:center;padding:2rem">
+      <div style="font-size:3rem;margin-bottom:0.5rem">☕</div>
+      <div style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);margin-bottom:1.5rem">Even pauze</div>
+      <div style="font-size:1rem;color:var(--cream-dim)">Volgende: <strong style="color:var(--cream)">${roundNames[nextPhase]||nextPhase}</strong></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:400px;margin-top:1.5rem">
+      ${[...game.players].sort((a,b)=>b.seconds-a.seconds).map((p,i)=>`
+        <div style="display:flex;align-items:center;gap:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1.25rem">
+          <span style="font-size:1.3rem">${['🥇','🥈','🥉'][i]}</span>
+          <span style="flex:1;font-weight:500;color:${p.color}">${esc(p.name)}</span>
+          <span style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold)">${p.seconds}s</span>
+        </div>`).join('')}
+    </div>`,projScoresHTML(),'Pauze');
+}
+
+function applyNextPhase(){
+  const phase=game._nextPhase;
+  const setup=game._nextSetup;
+  game.phase=phase;
+  if(setup){
+    if(setup.r2) Object.assign(game.r2,setup.r2);
+    if(setup.r3) Object.assign(game.r3,setup.r3);
+    if(setup.r4) Object.assign(game.r4,setup.r4);
+    if(setup.r5) Object.assign(game.r5,setup.r5);
+    if(setup.finaleSetup){ showSecondAdjust(); return; }
+  }
+  renderGame();
+  if(phase!=='r2') startTimer();
+}
+
+function showSecondAdjust(){
+  stopTimer();
+  const gm=document.getElementById('gameMain');
+  const titleEl=document.getElementById('roundTitle');
+  if(titleEl) titleEl.textContent='Seconden aanpassen';
+  gm.innerHTML=`
+    <div style="max-width:480px;margin:0 auto;padding:2rem 1rem;text-align:center">
+      <div style="font-size:2rem;margin-bottom:0.5rem">⚙️</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);margin-bottom:0.5rem">Seconden aanpassen</h2>
+      <p style="color:var(--cream-dim);font-size:0.85rem;font-weight:300;margin-bottom:2rem">Pas indien nodig de seconden aan vóór de finale start.</p>
+      <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem">
+        ${game.players.map((p,i)=>`
+          <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem">
+            <div style="width:14px;height:14px;border-radius:50%;background:${p.color};flex-shrink:0"></div>
+            <span style="flex:1;font-weight:500;color:${p.color};text-align:left">${esc(p.name)}</span>
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <button class="btn btn-ghost btn-sm" style="font-size:1.2rem;padding:0.2rem 0.6rem" onclick="adjustSeconds(${i},-10)">−10</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:1.2rem;padding:0.2rem 0.6rem" onclick="adjustSeconds(${i},-1)">−1</button>
+              <input type="number" id="secInput${i}" value="${p.seconds}" min="0" max="999"
+                style="width:70px;text-align:center;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold);background:var(--navy-mid);border:1px solid var(--border-bright);border-radius:6px;padding:0.3rem"
+                onchange="game.players[${i}].seconds=Math.max(0,parseInt(this.value)||0);updateScoreDisplay();updateProjection(null,projScoresHTML(),null)">
+              <button class="btn btn-ghost btn-sm" style="font-size:1.2rem;padding:0.2rem 0.6rem" onclick="adjustSeconds(${i},1)">+1</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:1.2rem;padding:0.2rem 0.6rem" onclick="adjustSeconds(${i},10)">+10</button>
+            </div>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-gold btn-lg" style="width:100%" onclick="startFinaleInternal()">▶ Start Finale</button>
+    </div>
+  `;
+  updateProjection(`<div style="text-align:center;padding:3rem">
+    <div style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);margin-bottom:1rem">Finale</div>
+    <div style="font-size:1rem;color:var(--cream-dim)">Komt eraan...</div>
+  </div>`,projScoresHTML(),'Finale');
+}
+
+function adjustSeconds(playerIdx, delta){
+  game.players[playerIdx].seconds = Math.max(0, game.players[playerIdx].seconds + delta);
+  const input = document.getElementById('secInput'+playerIdx);
+  if(input) input.value = game.players[playerIdx].seconds;
+  updateScoreDisplay();
+  updateProjection(null,projScoresHTML(),null);
+}
+
+function startGameSetup(){ showPage('pageSetup'); }
+
+function startGame(){
+  const names=[
+    document.getElementById('pName0').value||'Kandidaat 1',
+    document.getElementById('pName1').value||'Kandidaat 2',
+    document.getElementById('pName2').value||'Kandidaat 3',
+  ];
+  game={
+    players:names.map((n,i)=>({name:n,color:COLORS[i],seconds:60})),
+    phase:'r1',
+    r1:{qIdx:0,currentPlayer:0},
+    r2:{fragIdx:0,currentPlayer:0,picksLeft:[2,2,2],revealed:[],themeSelected:false,order:[0,1,2,3,4,5],usedThemes:[]},
+    r3:{fragIdx:0,currentPlayer:0,revealed:[]},
+    r4:{fragIdx:0,currentPlayer:0,correctPerImg:[],wrongPerImg:[],imgIdx:0,phase:'main'},
+    r5:{fragIdx:0,currentPlayer:0,revealed:[]},
+    finale:{qIdx:0,currentPlayer:0,revealedAnswers:[],finalistIdxs:[],eliminatedIdx:-1},
+  };
+  showPage('pageGame');
+  renderGame();
+  // no timer in r1
+}
+
+function getPlayerWithLeast(pool){
+  const arr=pool||game.players.map((_,i)=>i);
+  let min=Infinity,idx=arr[0];
+  arr.forEach(i=>{if(game.players[i].seconds<min){min=game.players[i].seconds;idx=i;}});
+  return idx;
+}
+
+// ── PROJECTION WINDOW ──
+function openProjection(){
+  projWin=window.open('','_blank','width=1280,height=720,menubar=no,toolbar=no,location=no');
+  projWin.document.write(buildProjectionHTML());
+  projWin.document.close();
+  // Push current state as soon as window is ready
+  setTimeout(()=>{
+    updateProjection(null,projScoresHTML(),getRoundTitle());
+    renderGameRound(); // re-renders current round, which calls updateProjection with content
+  },400);
+}
+
+function buildProjectionHTML(){
+  return `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#C9A84C;--navy:#1a0000;--navy-card:#3a0a00;--navy-hover:#4a1000;--cream:#FAF6EE;--cream-dim:#C8BFA8;--muted:#8A6A6A;--green:#1A7A4A;--border:rgba(201,168,76,0.2);--border-bright:rgba(201,168,76,0.5);}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--cream);min-height:100vh;display:flex;flex-direction:column}
+
+    /* ── HEADER ── */
+    #proj-header{background:#200500;border-bottom:3px solid #8B0000;padding:0 1.5rem;display:flex;align-items:stretch;min-height:90px}
+    #proj-title{font-family:'Playfair Display',serif;font-size:1rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;display:flex;align-items:center;min-width:200px}
+    #proj-scores{display:flex;flex:1;justify-content:center}
+
+    /* ── SCORE BLOKKEN ── */
+    .pscore{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 2.5rem;position:relative;border-left:1px solid rgba(255,255,255,0.08);transition:all 0.3s}
+    .pscore:first-child{border-left:none}
+    .pscore-active{background:rgba(201,168,76,0.1);border-radius:8px;outline:2px solid rgba(201,168,76,0.5)}
+    .pscore-name{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#aaa;margin-bottom:0.3rem;transition:color 0.3s}
+    .pscore-val{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:var(--gold);line-height:1;text-shadow:0 0 20px rgba(201,168,76,0.4);transition:all 0.3s}
+    .pscore-active .pscore-val{font-size:4.5rem;text-shadow:0 0 30px rgba(255,215,0,0.7),0 0 60px rgba(255,215,0,0.3)}
+
+    /* ── CONTENT ── */
+    #proj-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;max-width:1000px;width:100%;margin:0 auto}
+    .pq-box{background:var(--navy-card);border:1px solid var(--border-bright);border-radius:12px;padding:2rem;width:100%;text-align:center;margin-bottom:1.5rem}
+    .pq-num{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem}
+    .pq-text{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--cream);line-height:1.4}
+    .pq-media img{max-width:100%;max-height:280px;border-radius:8px;margin:1rem auto;display:block}
+    .pq-media iframe{width:100%;height:300px;border:none;border-radius:8px;margin:1rem 0;display:block}
+    .pq-media audio{width:100%;margin:0.5rem 0}
+    .pq-media video{width:100%;border-radius:8px;display:block}
+    .p-answers{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;width:100%}
+    .p-ans{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.75rem;transition:all 0.3s}
+    .p-ans.revealed{border-color:var(--green);background:rgba(26,122,74,0.15)}
+    .p-ans-num{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.3);color:var(--muted);font-size:0.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .p-ans.revealed .p-ans-num{background:var(--green);color:#fff}
+    .p-ans-text{font-size:0.95rem;color:var(--cream-dim)}
+    .p-ans.revealed .p-ans-text{color:var(--cream);font-weight:500}
+    .p-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;width:100%}
+    .p-theme{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;text-align:center;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)}
+    .p-theme.used{opacity:0.35;text-decoration:line-through}
+    .p-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;width:100%}
+    .p-gitem{border:2px solid var(--border);border-radius:8px;overflow:hidden;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:var(--navy-card);font-size:1.5rem;color:var(--muted);position:relative}
+    .p-gitem img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0}
+    .p-gitem.active{border-color:var(--gold)}
+    .p-gitem.correct{border-color:var(--green)}
+    .p-gitem.wrong{border-color:#C0392B}
+    .p-puzzle{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;width:100%}
+    .p-cell{background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center;font-size:0.95rem;min-height:70px;display:flex;align-items:center;justify-content:center}
+    .p-cell.matched{border-color:var(--green);background:rgba(26,122,74,0.2);color:#4ade80}
+    .finale-q{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);text-align:center;line-height:1.3;margin-bottom:1.5rem}
+    .p-banner{font-size:0.9rem;color:var(--cream-dim);text-align:center;margin-bottom:1rem;padding:0.6rem 1.5rem;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:8px}
+    .p-banner strong{color:var(--gold)}
+    .p-scores-big{display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:500px}
+    .p-score-row{display:flex;align-items:center;gap:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1.25rem}
+    .p-score-row-name{flex:1;font-size:1rem;font-weight:500}
+    .p-score-row-val{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold)}
+  </style></head><body>
+  <div id="proj-header">
+    <div id="proj-title">De Slimste Mens ter Wereld</div>
+    <div id="proj-scores"></div>
+  </div>
+  <div id="proj-content"><p style="color:var(--muted);text-align:center">Wacht op de host...</p></div>
+  </body></html>`;
+}
+
+function updateProjection(contentHTML,scoresHTML,titleHTML){
+  if(!projWin||projWin.closed) return;
+  try{
+    if(titleHTML) projWin.document.getElementById('proj-title').innerHTML=titleHTML;
+    if(scoresHTML) projWin.document.getElementById('proj-scores').innerHTML=scoresHTML;
+    if(contentHTML) projWin.document.getElementById('proj-content').innerHTML=contentHTML;
+  }catch(e){}
+}
+
+function projScoresHTML(){
+  const activeIdx = getActiveTimerPlayer();
+  return game.players.map((p,i)=>{
+    const isActive = i===activeIdx && game.phase!=='r1';
+    return `<div class="pscore ${isActive?'pscore-active':''}">
+      <div class="pscore-name" style="color:${isActive?p.color:'#aaa'}">${esc(p.name)}${isActive?' ◀':''}</div>
+      <div class="pscore-val" style="color:${isActive?'#FFD700':'var(--gold)'};">${p.seconds}s</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER GAME (HOST) ──
+function renderGame(){
+  const el=document.getElementById('pageGame');
+  el.innerHTML=`
+    <header class="game-header">
+      <div id="roundTitle" class="game-round-title">${getRoundTitle()}</div>
+      <div id="liveScores" class="player-scores">${game.players.map((p,i)=>renderPlayerScore(p,i)).join('')}</div>
+      <div style="display:flex;gap:0.5rem">
+        <button id="pauseBtn" class="btn btn-ghost btn-sm" onclick="pauseTimer()">⏸ Pauze</button>
+        <button class="btn btn-outline btn-sm" onclick="openProjection()">📺 Projectiescherm</button>
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Quiz stoppen?')){stopTimer();showPage('pageHome')}">✕ Stop</button>
+      </div>
+    </header>
+    <div class="game-main" id="gameMain"></div>
+  `;
+  renderGameRound();
+  // scores always updated; content updated by each renderXXXGame individually
+  updateProjection(null,projScoresHTML(),getRoundTitle());
+}
+
+function renderPlayerScore(p,i){
+  const isActive = i===getActiveTimerPlayer();
+  return `<div class="player-score">
+    <div class="player-score-name" style="color:${p.color}">${esc(p.name)}</div>
+    <div class="player-score-time ${p.seconds<=10?'danger':p.seconds<=20?'warning':''}" style="${isActive&&game.phase!=='r1'?'border-bottom:2px solid '+p.color:''}">${p.seconds}s</div>
+  </div>`;
+}
+
+function getRoundTitle(){
+  const t={r1:'Ronde 1 · 3-6-9',r2:'Ronde 2 · Open Deur',r3:'Ronde 3 · Puzzel',r4:'Ronde 4 · Galerij',r5:'Ronde 5 · Collectief Geheugen',finale:'Finale',end:'Eindstand'};
+  return t[game.phase]||'';
+}
+
+function renderGameRound(){
+  if(game.phase==='r1') renderR1Game();
+  else if(game.phase==='r2') renderR2Game();
+  else if(game.phase==='r3') renderR3Game();
+  else if(game.phase==='r4') renderR4Game();
+  else if(game.phase==='r5') renderR5Game();
+  else if(game.phase==='finale') renderFinaleGame();
+  else if(game.phase==='end') renderEndGame();
+}
+
+// ══════════════════════════════════════
+// RONDE 1 — 3-6-9
+// ══════════════════════════════════════
+function renderR1Game(){
+  const m = game.r1;
+  const q = quiz.r1[m.qIdx];
+  const p = game.players[m.currentPlayer];
+  const isPoint = q.points;
+  const gm = document.getElementById('gameMain');
+  gm.innerHTML = `
+    <div class="active-player-banner">Beurt van <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="game-question-box">
+      <div class="game-question-number">Vraag ${m.qIdx+1} van 15${isPoint?' · ⭐ Puntenvraag':''}</div>
+      ${q.isListen?`<div class="game-question-media">${renderMedia(q.audioUrl,'audio')}</div>`:''}
+      ${q.imageUrl?`<div class="game-question-media"><img src="${proxyImg(q.imageUrl)}" alt=""></div>`:''}
+      <div class="game-question-text">${esc(q.text)||'<em>Geen vraag ingevuld</em>'}</div>
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;text-align:center;margin-bottom:1rem">
+      <span style="font-size:0.78rem;color:var(--muted)">Antwoord (alleen host): </span>
+      <strong style="color:var(--gold)">${esc(q.answer||'—')}</strong>
+      ${isPoint?`<span style="font-size:0.75rem;color:var(--gold);margin-left:1rem">→ goed = +10s voor ${esc(p.name)}</span>`:''}
+    </div>
+    <div class="game-controls">
+      <button class="btn btn-danger" onclick="r1Wrong()">✗ Fout / Volgende</button>
+      <button class="btn btn-green" onclick="r1Correct()">✓ Goed</button>
+    </div>
+  `;
+  // Projection: question without answer
+  updateProjection(`
+    <div class="p-banner">Beurt van <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="pq-box">
+      <div class="pq-num">Vraag ${m.qIdx+1} van 15${isPoint?' · ⭐ Puntenvraag':''}</div>
+      ${q.imageUrl?`<div class="pq-media"><img src="${proxyImg(q.imageUrl)}"></div>`:''}
+      <div class="pq-text">${esc(q.text)||''}</div>
+    </div>`, projScoresHTML(), getRoundTitle());
+}
+
+function r1Correct(){
+  const m=game.r1;
+  const q=quiz.r1[m.qIdx];
+  if(q.points){game.players[m.currentPlayer].seconds+=10;toast('+10s voor '+game.players[m.currentPlayer].name,'success');}
+  m.qIdx++;
+  if(m.qIdx>=15){
+    game.r2.currentPlayer=getPlayerWithLeast();
+    showIntermission('r2',{r2:{currentPlayer:game.r2.currentPlayer}});
+    return;
+  }
+  renderGame();
+}
+function r1Wrong(){
+  const m=game.r1;
+  m.currentPlayer=(m.currentPlayer+1)%3;
+  m.qIdx++;
+  if(m.qIdx>=15){
+    game.r2.currentPlayer=getPlayerWithLeast();
+    showIntermission('r2',{r2:{currentPlayer:game.r2.currentPlayer}});
+    return;
+  }
+  renderGame();
+}
+
+// ══════════════════════════════════════
+// RONDE 2 — OPEN DEUR
+// Timer pauzeert tijdens themakeuze, start bij keuze
+// Volgorde: minste tijd eerst, dan l→r; na 3 picks opnieuw minste eerst
+// ══════════════════════════════════════
+function buildTurnOrder(){
+  const least=getPlayerWithLeast();
+  return [0,1,2].map(i=>(least+i)%3);
+}
+
+function renderR2Game(){
+  const m=game.r2;
+  if(!m.turnOrder){
+    m.turnOrder=buildTurnOrder();
+    m.turnIdx=0;
+    m.roundNum=1;
+    m.currentPlayer=m.turnOrder[0];
+    if(!m.usedThemes) m.usedThemes=[];
+  }
+  if(m.usedThemes.length>=6){
+    showIntermission('r3',{r3:{currentPlayer:getPlayerWithLeast()}});
+    return;
+  }
+  if(!m.themeSelected){
+    stopTimer(); // altijd timer stoppen bij themakeuze, ook na 1e thema
+    renderR2ThemePicker();
+  } else {
+    renderR2Answering();
+  }
+}
+
+function renderR2ThemePicker(){
+  const m=game.r2;
+  const p=game.players[m.currentPlayer];
+  const usedThemes=m.usedThemes||[];
+  const pickLabel=m.roundNum===1?'1e keuze':'2e keuze';
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div class="active-player-banner"><strong style="color:${p.color}">${esc(p.name)}</strong> kiest een thema · ${pickLabel}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;width:100%;margin-bottom:1.5rem">
+      ${quiz.r2.map((q,i)=>{
+        const done=usedThemes.includes(i);
+        return `<div style="background:var(--navy-card);border:1px solid ${done?'rgba(255,255,255,0.05)':`var(--border-bright)`};border-radius:10px;padding:1.5rem;text-align:center;opacity:${done?0.35:1};${done?'':'cursor:pointer;transition:all 0.15s'}" ${done?'':`onclick="r2SelectTheme(${i})"`}>
+          <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:${done?'var(--muted)':`var(--cream)`};">${esc(q.theme)||'Thema '+(i+1)}</div>
+          ${done?'<div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">Al gespeeld</div>':''} 
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:0.78rem;color:var(--muted);text-align:center">⏸ Timer staat stil — start zodra een thema gekozen is</div>
+  `;
+  updateProjection(`
+    <div class="p-banner"><strong style="color:${p.color}">${esc(p.name)}</strong> kiest een thema · ${pickLabel}</div>
+    <div class="p-themes">
+      ${quiz.r2.map((q,i)=>{
+        const done=(m.usedThemes||[]).includes(i);
+        return `<div class="p-theme ${done?'used':''}">${esc(q.theme||'Thema '+(i+1))}</div>`;
+      }).join('')}
+    </div>`,projScoresHTML(),getRoundTitle());
+}
+
+function r2SelectTheme(idx){
+  const m=game.r2;
+  m.fragIdx=idx;
+  m.themeSelected=true;
+  m.usedThemes.push(idx);
+  if(!m.revealed[idx]) m.revealed[idx]=[];
+  startTimer();
+  renderR2Answering();
+}
+
+function renderR2Answering(){
+  const m=game.r2;
+  const p=game.players[m.currentPlayer];
+  const q=quiz.r2[m.fragIdx];
+  const revealed=m.revealed[m.fragIdx]||[];
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> · thema: <em style="color:var(--cream)">${esc(q.theme)}</em></div>
+    <div class="game-question-box">
+      <div class="game-question-number">Open Deur · ${revealed.length}/4 antwoorden gevonden</div>
+      ${q.imageUrl?`<div class="game-question-media"><img src="${proxyImg(q.imageUrl)}" alt=""></div>`:''}
+    </div>
+    <div class="answers-panel">
+      ${q.answers.map((a,i)=>`<div class="answer-slot ${revealed.includes(i)?'revealed':''}">
+        <div class="answer-slot-num">${i+1}</div>
+        <div class="answer-slot-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem">Antwoorden (alleen host):</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem">
+        ${q.answers.map((a,i)=>revealed.includes(i)?'':`<div style="font-size:0.85rem;color:var(--gold);">${i+1}. ${esc(a)}</div>`).join('')}
+      </div>
+    </div>
+    <div class="game-controls">
+      ${q.answers.map((a,i)=>revealed.includes(i)?'':`<button class="btn btn-green btn-sm" onclick="r2Reveal(${i})">✓ ${esc(a)} (+20s)</button>`).join('')}
+      ${revealed.length<4?`<button class="btn btn-ghost btn-sm" onclick="r2NextPlayer()">→ Volgende kandidaat probeert</button>`:''}
+      <button class="btn btn-outline btn-sm" onclick="r2DoneTheme()">Volgend thema →</button>
+    </div>
+  `;
+  updateProjection(`
+    <div class="p-banner">Thema: <strong>${esc(q.theme)}</strong> · Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    ${q.imageUrl?`<div class="pq-media" style="text-align:center;margin-bottom:1rem"><img src="${proxyImg(q.imageUrl)}" style="max-height:150px;border-radius:8px"></div>`:''}
+    <div class="p-answers">
+      ${q.answers.map((a,i)=>`<div class="p-ans ${revealed.includes(i)?'revealed':''}">
+        <div class="p-ans-num">${i+1}</div>
+        <div class="p-ans-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>`,projScoresHTML(),getRoundTitle());
+}
+
+function r2Reveal(ansIdx){
+  const m=game.r2;
+  if(!m.revealed[m.fragIdx]) m.revealed[m.fragIdx]=[];
+  m.revealed[m.fragIdx].push(ansIdx);
+  game.players[m.currentPlayer].seconds+=20;
+  toast('+20s voor '+game.players[m.currentPlayer].name,'success');
+  updateScoreDisplay();
+  updateProjection(null,projScoresHTML(),null);
+  renderR2Answering();
+}
+
+function r2NextPlayer(){
+  const m=game.r2;
+  const order=m.turnOrder;
+  const pos=order.indexOf(m.currentPlayer);
+  m.currentPlayer=order[(pos+1)%3];
+  renderR2Answering();
+}
+
+function r2DoneTheme(){
+  const m=game.r2;
+  stopTimer();
+  m.themeSelected=false;
+  if(m.roundNum===1){
+    m.turnIdx=(m.turnIdx||0)+1;
+    if(m.turnIdx>=3){
+      m.roundNum=2;
+      m.turnOrder2=buildTurnOrder();
+      m.turn2Idx=0;
+      m.currentPlayer=m.turnOrder2[0];
+    } else {
+      m.currentPlayer=m.turnOrder[m.turnIdx];
+    }
+  } else {
+    m.turn2Idx=(m.turn2Idx||0)+1;
+    if(m.turn2Idx>=3||m.usedThemes.length>=6){
+      showIntermission('r3',{r3:{currentPlayer:getPlayerWithLeast()}});
+      return;
+    }
+    m.currentPlayer=m.turnOrder2[m.turn2Idx];
+  }
+  if(m.usedThemes.length>=6){
+    showIntermission('r3',{r3:{currentPlayer:getPlayerWithLeast()}});
+    return;
+  }
+  renderGame();
+}
+
+// ══════════════════════════════════════
+// RONDE 3 — PUZZEL
+// Volgorde per puzzel: minste tijd eerst, dan l→r; iedereen 1x
+// ══════════════════════════════════════
+function renderR3Game(){
+  const m=game.r3;
+  if(m.fragIdx>=quiz.r3.length){
+    showIntermission('r4',{r4:{currentPlayer:getPlayerWithLeast()}});
+    return;
+  }
+  if(!m.puzzleOrder||m.puzzleOrder.fragIdx!==m.fragIdx){
+    // Rotate start: fragIdx 0 → least first, fragIdx 1 → shift by 1, fragIdx 2 → shift by 2
+    const least=getPlayerWithLeast();
+    const startOffset=m.fragIdx%3;
+    const order=[0,1,2].map(i=>(least+i+startOffset)%3);
+    m.puzzleOrder={fragIdx:m.fragIdx,order,idx:0};
+    m.currentPlayer=order[0];
+  }
+  const po=m.puzzleOrder;
+  const p=game.players[m.currentPlayer];
+  const q=quiz.r3[m.fragIdx];
+  const revealed=m.revealed[m.fragIdx]||[];
+  const allClues=q.answers.flatMap((ans,gi)=>(ans.clues||['','','','']).map(c=>({text:c,group:gi})));
+  const hasNext=po.idx<2;
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong>
+      <span style="font-size:0.75rem;color:var(--muted);margin-left:0.75rem">Volgorde: ${po.order.map((pi,n)=>`<span style="color:${n===po.idx?game.players[pi].color:'var(--muted)'}">${esc(game.players[pi].name)}</span>`).join(' → ')}</span>
+    </div>
+    <div class="game-question-box" style="padding:1rem">
+      <div class="game-question-number">Puzzel ${m.fragIdx+1} van ${quiz.r3.length} · Groepeer de 12 hokjes in ${q.answers.length} groepen van 4</div>
+    </div>
+    <div class="puzzle-grid">
+      ${allClues.map(c=>`<div class="puzzle-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
+    </div>
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;width:100%">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem">Oplossingen (alleen host):</div>
+      ${q.answers.map((ans,gi)=>{
+        const isRev=revealed.includes(gi);
+        return `<div style="display:flex;align-items:center;gap:0.75rem;background:var(--navy-card);border:1px solid ${isRev?'var(--green)':'var(--border)'};border-radius:8px;padding:0.6rem 1rem">
+          <span style="flex:1;font-size:0.85rem"><span style="color:var(--gold)">Groep ${gi+1}:</span> <strong style="color:${isRev?'#4ade80':'var(--cream)'}">${esc(ans.solution)}</strong></span>
+          ${!isRev?`<button class="btn btn-green btn-sm" onclick="r3Reveal(${gi})">✓ Correct (+30s)</button>`:'<span style="color:var(--green);font-size:0.8rem">✓ Gevonden</span>'}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="game-controls" style="margin-top:1rem">
+      ${hasNext?`<button class="btn btn-ghost btn-sm" onclick="r3NextPlayer()">→ ${esc(game.players[po.order[po.idx+1]].name)} probeert</button>`:''}
+      <button class="btn btn-outline btn-sm" onclick="r3Next()">Volgende puzzel →</button>
+    </div>
+  `;
+  updateProjection(`
+    <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> · Puzzel ${m.fragIdx+1}</div>
+    <div class="p-puzzle">
+      ${allClues.map(c=>`<div class="p-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+      ${q.answers.map((ans,gi)=>revealed.includes(gi)?`<div style="background:rgba(26,122,74,0.2);border:1px solid var(--green);border-radius:6px;padding:0.4rem 1rem;font-size:0.9rem;color:#4ade80">✓ ${esc(ans.solution)}</div>`:'')}
+    </div>`,projScoresHTML(),getRoundTitle());
+}
+
+function r3Reveal(gi){
+  if(!game.r3.revealed[game.r3.fragIdx]) game.r3.revealed[game.r3.fragIdx]=[];
+  game.r3.revealed[game.r3.fragIdx].push(gi);
+  game.players[game.r3.currentPlayer].seconds+=30;
+  toast('+30s voor '+game.players[game.r3.currentPlayer].name,'success');
+  updateScoreDisplay();
+  updateProjection(null,projScoresHTML(),null);
+  renderR3Game();
+}
+function r3NextPlayer(){
+  const m=game.r3;
+  m.puzzleOrder.idx++;
+  m.currentPlayer=m.puzzleOrder.order[m.puzzleOrder.idx];
+  renderR3Game();
+}
+function r3Next(){
+  game.r3.fragIdx++;
+  game.r3.puzzleOrder=null;
+  renderR3Game();
+}
+
+// ══════════════════════════════════════
+// RONDE 4 — GALERIJ (per foto +10s, volgorde links→rechts)
+// Fase 1: hoofdkandidaat gaat alle 8 foto's langs
+// Fase 2: foute foto's worden aangeboden aan andere kandidaten in volgorde
+// ══════════════════════════════════════
+function renderR4Game(){
+  const m=game.r4;
+  if(m.fragIdx>=quiz.r4.length){
+    showIntermission('r5',{r5:{currentPlayer:getPlayerWithLeast()}});
+    return;
+  }
+  if(!m.correctPerImg[m.fragIdx]) m.correctPerImg[m.fragIdx]=[];
+  if(!m.wrongPerImg[m.fragIdx]) m.wrongPerImg[m.fragIdx]=[];
+
+  if(m.phase==='main'){
+    renderR4Main();
+  } else {
+    renderR4Retry();
+  }
+}
+
+function renderR4Main(){
+  const m=game.r4;
+  const q=quiz.r4[m.fragIdx];
+  const correct=m.correctPerImg[m.fragIdx];
+  const wrong=m.wrongPerImg[m.fragIdx];
+  const imgIdx=m.imgIdx||0;
+  const p=game.players[m.currentPlayer];
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> · alle 8 foto's langs</div>
+    <div class="game-question-box" style="padding:1rem">
+      <div class="game-question-number">Galerij ${m.fragIdx+1} van ${quiz.r4.length} · Foto ${imgIdx+1} van 8</div>
+    </div>
+    <div class="gallery-grid">
+      ${q.images.map((img,i)=>{
+        const isActive=i===imgIdx,isDone=correct.includes(i)||wrong.includes(i),isCorrect=correct.includes(i),isWrong=wrong.includes(i);
+        return `<div class="gallery-item" style="border-color:${isCorrect?'var(--green)':isWrong?'var(--red)':isActive?'var(--gold)':'var(--border)'};position:relative">
+          ${img&&i<=imgIdx?`<img src="${proxyImg(img)}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:1.2rem;color:var(--muted)\">🖼️</span>'">`:`<span style="font-size:1.5rem">${i<=imgIdx?'📷':'?'}</span>`}
+          ${isCorrect?'<div style="position:absolute;bottom:3px;right:3px;background:var(--green);color:#fff;border-radius:3px;font-size:0.6rem;padding:2px 4px">✓+10s</div>':''}
+          ${isWrong?'<div style="position:absolute;bottom:3px;right:3px;background:var(--red);color:#fff;border-radius:3px;font-size:0.6rem;padding:2px 4px">✗</div>':''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin:0.75rem 0;text-align:center">
+      <span style="font-size:0.78rem;color:var(--muted)">Antwoord bij foto ${imgIdx+1} (alleen host): </span>
+      <strong style="color:var(--gold)">${esc(q.answers&&q.answers[imgIdx]?q.answers[imgIdx]:q.theme||'—')}</strong>
+    </div>
+    <div class="game-controls">
+      <button class="btn btn-green btn-sm" onclick="r4MainCorrect()">✓ Goed (+10s)</button>
+      <button class="btn btn-danger btn-sm" onclick="r4MainWrong()">✗ Fout</button>
+    </div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;text-align:center">Goed: ${correct.length} · Fout: ${wrong.length}</div>
+  `;
+  // Projection
+  const projImgs=q.images.map((img,i)=>{
+    const isActive=i===imgIdx,isCorrect=correct.includes(i),isWrong=wrong.includes(i);
+    return `<div class="p-gitem ${isActive?'active':''} ${isCorrect?'correct':''} ${isWrong?'wrong':''}">
+      ${img&&i<=imgIdx?`<img src="${proxyImg(img)}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:1.2rem;color:var(--muted)\">🖼️</span>'">`:`<span>?</span>`}
+    </div>`;
+  }).join('');
+  updateProjection(`
+    <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> · Galerij ${m.fragIdx+1} · Foto ${imgIdx+1}/8</div>
+    <div class="p-gallery">${projImgs}</div>`,projScoresHTML(),getRoundTitle());
+}
+
+function r4MainCorrect(){
+  const m=game.r4;
+  if(!m.correctPerImg[m.fragIdx]) m.correctPerImg[m.fragIdx]=[];
+  m.correctPerImg[m.fragIdx].push(m.imgIdx||0);
+  game.players[m.currentPlayer].seconds+=10;
+  toast('+10s voor '+game.players[m.currentPlayer].name,'success');
+  updateScoreDisplay();
+  updateProjection(null,projScoresHTML(),null);
+  r4MainAdvance();
+}
+function r4MainWrong(){
+  const m=game.r4;
+  if(!m.wrongPerImg[m.fragIdx]) m.wrongPerImg[m.fragIdx]=[];
+  m.wrongPerImg[m.fragIdx].push(m.imgIdx||0);
+  r4MainAdvance();
+}
+function r4MainAdvance(){
+  const m=game.r4;
+  m.imgIdx=(m.imgIdx||0)+1;
+  if(m.imgIdx>=8){
+    // Check if there are wrong ones to retry
+    const wrongOnes=m.wrongPerImg[m.fragIdx]||[];
+    if(wrongOnes.length>0){
+      // start retry phase: next player in order (left to right, skip main player)
+      m.phase='retry';
+      m.retryQueue=[...wrongOnes]; // which images still to retry
+      m.retryImgIdx=0;
+      // next player = (mainPlayer+1)%3
+      m.retryPlayer=(m.currentPlayer+1)%3;
+      m.retryStartPlayer=m.retryPlayer; // track who started the retry round
+      renderR4Game();
+    } else {
+      r4NextGallery();
+    }
+    return;
+  }
+  renderR4Main();
+}
+
+function renderR4Retry(){
+  const m=game.r4;
+  const q=quiz.r4[m.fragIdx];
+  const correct=m.correctPerImg[m.fragIdx]||[];
+  const wrong=m.wrongPerImg[m.fragIdx]||[];
+  const remaining=m.retryQueue||[];
+  if(remaining.length===0){ r4NextGallery(); return; }
+  const imgIdx=remaining[m.retryImgIdx||0];
+  if(imgIdx===undefined){ r4NextGallery(); return; }
+  const p=game.players[m.retryPlayer];
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div class="active-player-banner">Foute foto's — aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="game-question-box" style="padding:1rem">
+      <div class="game-question-number">Galerij ${m.fragIdx+1} · Foto ${imgIdx+1} nog te raden (${remaining.length-(m.retryImgIdx||0)} over)</div>
+    </div>
+    <div class="gallery-grid">
+      ${q.images.map((img,i)=>{
+        const isActive=i===imgIdx,isCorrect=correct.includes(i);
+        const isRetryDone=remaining.indexOf(i)<(m.retryImgIdx||0)||correct.includes(i);
+        return `<div class="gallery-item" style="border-color:${isCorrect?'var(--green)':isActive?'var(--gold)':remaining.includes(i)&&!isCorrect?'var(--red)':'var(--border)'};opacity:${!remaining.includes(i)&&!isCorrect?0.4:1};position:relative">
+          ${img?`<img src="${proxyImg(img)}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:1.2rem;color:var(--muted)\">🖼️</span>'">`:`<span>📷</span>`}
+          ${isCorrect?'<div style="position:absolute;bottom:3px;right:3px;background:var(--green);color:#fff;border-radius:3px;font-size:0.6rem;padding:2px 4px">✓</div>':''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin:0.75rem 0;text-align:center">
+      <span style="font-size:0.78rem;color:var(--muted)">Antwoord foto ${imgIdx+1} (alleen host): </span>
+      <strong style="color:var(--gold)">${esc(q.answers&&q.answers[imgIdx]?q.answers[imgIdx]:q.theme||'—')}</strong>
+    </div>
+    <div class="game-controls">
+      <button class="btn btn-green btn-sm" onclick="r4RetryCorrect()">✓ Goed (+10s)</button>
+      <button class="btn btn-danger btn-sm" onclick="r4RetryWrong()">✗ Fout → volgende kandidaat</button>
+      <button class="btn btn-outline btn-sm" onclick="r4NextGallery()">Volgende galerij →</button>
+    </div>
+  `;
+  const projImgs=q.images.map((img,i)=>{
+    const isActive=i===imgIdx,isCorrect=correct.includes(i),isRem=remaining.includes(i);
+    return `<div class="p-gitem ${isActive?'active':''} ${isCorrect?'correct':''} ${isRem&&!isCorrect?'wrong':''}">
+      ${img?`<img src="${proxyImg(img)}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:1.2rem;color:var(--muted)\">🖼️</span>'">`:`<span>?</span>`}
+    </div>`;
+  }).join('');
+  updateProjection(`
+    <div class="p-banner">Foute foto's · <strong style="color:${p.color}">${esc(p.name)}</strong> probeert foto ${imgIdx+1}</div>
+    <div class="p-gallery">${projImgs}</div>`,projScoresHTML(),getRoundTitle());
+}
+
+function r4RetryCorrect(){
+  const m=game.r4;
+  const remaining=m.retryQueue||[];
+  const imgIdx=remaining[m.retryImgIdx||0];
+  if(!m.correctPerImg[m.fragIdx]) m.correctPerImg[m.fragIdx]=[];
+  m.correctPerImg[m.fragIdx].push(imgIdx);
+  // remove from wrong
+  m.wrongPerImg[m.fragIdx]=(m.wrongPerImg[m.fragIdx]||[]).filter(x=>x!==imgIdx);
+  game.players[m.retryPlayer].seconds+=10;
+  toast('+10s voor '+game.players[m.retryPlayer].name,'success');
+  updateScoreDisplay(); updateProjection(null,projScoresHTML(),null);
+  // advance to next retry image
+  m.retryImgIdx=(m.retryImgIdx||0)+1;
+  // rebuild queue from remaining wrong
+  m.retryQueue=(m.wrongPerImg[m.fragIdx]||[]).filter(x=>!m.correctPerImg[m.fragIdx].includes(x));
+  m.retryImgIdx=0;
+  renderR4Game();
+}
+
+function r4RetryWrong(){
+  const m=game.r4;
+  // pass to next player (skip main player)
+  let next=(m.retryPlayer+1)%3;
+  if(next===m.currentPlayer) next=(next+1)%3;
+  // advance to next image for new player
+  m.retryImgIdx=(m.retryImgIdx||0)+1;
+  if(m.retryImgIdx>=(m.retryQueue||[]).length) m.retryImgIdx=0;
+  m.retryPlayer=next;
+  renderR4Game();
+}
+
+function r4NextGallery(){
+  const m=game.r4;
+  m.fragIdx++;
+  m.imgIdx=0;
+  m.phase='main';
+  m.retryQueue=[];
+  m.retryImgIdx=0;
+  if(m.fragIdx>=quiz.r4.length){
+    showIntermission('r5',{r5:{currentPlayer:getPlayerWithLeast()}});
+    return;
+  }
+  m.currentPlayer=getPlayerWithLeast();
+  renderGame();
+}
+
+// ══════════════════════════════════════
+// RONDE 5 — COLLECTIEF GEHEUGEN
+// ══════════════════════════════════════
+function renderR5Game(){
+  const m=game.r5;
+  if(m.fragIdx>=quiz.r5.length){
+    showIntermission('finale',{finaleSetup:true});
+    return;
+  }
+  // Rotate start per fragment: fragIdx 0 → least, fragIdx 1 → shift 1, fragIdx 2 → shift 2
+  if(m.lastFragIdx!==m.fragIdx){
+    const least=getPlayerWithLeast();
+    const offset=m.fragIdx%3;
+    m.currentPlayer=(least+offset)%3;
+    m.lastFragIdx=m.fragIdx;
+  }
+  const p=game.players[m.currentPlayer];
+  const q = quiz.r5[m.fragIdx];
+  const revealed = m.revealed[m.fragIdx]||[];
+  const pts = [10,20,30,40,50];
+  const gm = document.getElementById('gameMain');
+  gm.innerHTML = `
+    <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="game-question-box">
+      <div class="game-question-number">Fragment ${m.fragIdx+1} van ${quiz.r5.length} · Collectief Geheugen</div>
+      ${q.videoUrl?`<div class="game-question-media">${renderMedia(q.videoUrl,'video')}</div>`:''}
+      <div class="game-question-text">${esc(q.theme)||'Thema niet ingevuld'}</div>
+    </div>
+    <div class="answers-panel">
+      ${q.answers.map((a,i)=>`<div class="answer-slot ${revealed.includes(i)?'revealed':''}">
+        <div class="answer-slot-num">${revealed.includes(i)?'+'+pts[i]+'s':i+1}</div>
+        <div class="answer-slot-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem">Antwoorden (alleen host):</div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        ${q.answers.map((a,i)=>revealed.includes(i)?'':`<span style="font-size:0.82rem;color:var(--gold)">${i+1}. ${esc(a)} <em style="color:var(--muted)">(+${pts[i]}s)</em></span>`).join('')}
+      </div>
+    </div>
+    <div class="game-controls">
+      ${q.answers.map((a,i)=>revealed.includes(i)?'':`<button class="btn btn-green btn-sm" onclick="r5Reveal(${i})">✓ ${esc(a)}</button>`).join('')}
+      <button class="btn btn-ghost btn-sm" onclick="r5NextPlayer()">→ Andere kandidaat</button>
+      <button class="btn btn-outline btn-sm" onclick="r5Next()">Volgend fragment →</button>
+    </div>
+    <div style="margin-top:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;width:100%">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.08em">Tussenstand</div>
+      ${game.players.map(pl=>`<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.9rem;border-bottom:1px solid var(--border)">
+        <span style="color:${pl.color}">${esc(pl.name)}</span><span style="color:var(--gold);font-weight:600">${pl.seconds}s</span>
+      </div>`).join('')}
+    </div>
+  `;
+  updateProjection(`
+    <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="pq-box">
+      <div class="pq-num">Fragment ${m.fragIdx+1} · Collectief Geheugen</div>
+      ${q.videoUrl?`<div class="pq-media">${renderMedia(q.videoUrl,'video')}</div>`:''}
+      <div class="pq-text">${esc(q.theme)}</div>
+    </div>
+    <div class="p-answers">
+      ${q.answers.map((a,i)=>`<div class="p-ans ${revealed.includes(i)?'revealed':''}">
+        <div class="p-ans-num">${revealed.includes(i)?'+'+pts[i]+'s':i+1}</div>
+        <div class="p-ans-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>`, projScoresHTML(), getRoundTitle());
+}
+
+function r5Reveal(i){
+  if(!game.r5.revealed[game.r5.fragIdx]) game.r5.revealed[game.r5.fragIdx]=[];
+  game.r5.revealed[game.r5.fragIdx].push(i);
+  const pts=[10,20,30,40,50];
+  game.players[game.r5.currentPlayer].seconds+=pts[i];
+  toast('+'+pts[i]+'s voor '+game.players[game.r5.currentPlayer].name,'success');
+  renderR5Game();
+  updateProjection(null,projScoresHTML(),null);
+}
+function r5NextPlayer(){ game.r5.currentPlayer=(game.r5.currentPlayer+1)%3; renderR5Game(); }
+function r5Next(){
+  game.r5.fragIdx++;
+  // currentPlayer will be set by renderR5Game based on rotation
+  renderR5Game();
+}
+
+function startFinaleInternal(){
+  const sorted=game.players.map((p,i)=>({...p,idx:i})).sort((a,b)=>b.seconds-a.seconds);
+  game.finale.finalistIdxs=[sorted[0].idx,sorted[1].idx];
+  game.finale.eliminatedIdx=sorted[2].idx;
+  game.finale.currentPlayer=sorted[1].idx;
+  game.phase='finale';
+  renderGame();
+  startTimer();
+}
+
+function renderFinaleGame(){
+  const m = game.finale;
+  if(m.qIdx>=quiz.finale.length){ game.phase='end'; renderGame(); return; }
+  const q = quiz.finale[m.qIdx];
+  const cp = m.currentPlayer;
+  const p = game.players[cp];
+  const otherIdx = m.finalistIdxs.find(i=>i!==cp);
+  const other = game.players[otherIdx];
+  const eliminated = game.players[m.eliminatedIdx];
+  const revealed = m.revealedAnswers[m.qIdx]||[];
+  const gm = document.getElementById('gameMain');
+
+  // Check if a finalist ran out
+  const outIdx = m.finalistIdxs.find(i=>game.players[i].seconds<=0);
+
+  gm.innerHTML = `
+    <div style="background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:8px;padding:0.6rem 1rem;margin-bottom:1rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+      <span style="font-size:0.8rem;color:var(--muted)">Finalisten:</span>
+      ${m.finalistIdxs.map(i=>`<span style="font-weight:600;color:${game.players[i].color}">${esc(game.players[i].name)} <span style="color:var(--gold)">${game.players[i].seconds}s</span></span>`).join('<span style="color:var(--muted)">vs</span>')}
+      <span style="font-size:0.75rem;color:var(--muted);margin-left:auto">🥉 ${esc(eliminated.name)} (uitgeschakeld)</span>
+    </div>
+    <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> — blijft aan beurt tot geen antwoorden meer</div>
+    <div class="game-question-box">
+      <div class="game-question-number">Finalevraag ${m.qIdx+1} van ${quiz.finale.length}</div>
+      <div class="finale-question">Wat weet je van<br><em>${esc(q.question)||'...'}</em> ?</div>
+    </div>
+    <div class="answers-panel">
+      ${q.answers.map((a,i)=>`<div class="answer-slot ${revealed.includes(i)?'revealed':''}">
+        <div class="answer-slot-num">${i+1}</div>
+        <div class="answer-slot-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem">Antwoorden (alleen host) — per goed antwoord: −20s voor <strong style="color:${other.color}">${esc(other.name)}</strong>:</div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        ${q.answers.map((a,i)=>revealed.includes(i)?'':`<span style="font-size:0.85rem;color:var(--gold)">${i+1}. ${esc(a)}</span>`).join('')}
+      </div>
+    </div>
+    <div class="game-controls">
+      ${q.answers.map((a,i)=>revealed.includes(i)?'':`<button class="btn btn-green btn-sm" onclick="finaleReveal(${i})">✓ ${esc(a)}</button>`).join('')}
+      <button class="btn btn-ghost btn-sm" onclick="finalePassToOther()">→ Andere finalist aan de beurt</button>
+      <button class="btn btn-outline btn-sm" onclick="finaleNext()">Volgende vraag →</button>
+    </div>
+    ${outIdx!==undefined?`<div style="background:rgba(192,57,43,0.15);border:1px solid var(--red);border-radius:8px;padding:1rem;text-align:center;margin-top:1rem;width:100%">
+      <strong style="color:var(--red)">${esc(game.players[outIdx].name)} heeft geen seconden meer!</strong><br>
+      <button class="btn btn-gold" style="margin-top:0.75rem" onclick="game.phase='end';renderGame()">Eindscore bekijken</button>
+    </div>`:''}
+  `;
+  updateProjection(`
+    <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="finale-q">Wat weet je van<br><em>${esc(q.question)}</em> ?</div>
+    <div class="p-answers">
+      ${q.answers.map((a,i)=>`<div class="p-ans ${revealed.includes(i)?'revealed':''}">
+        <div class="p-ans-num">${i+1}</div>
+        <div class="p-ans-text">${revealed.includes(i)?esc(a):'???'}</div>
+      </div>`).join('')}
+    </div>`, projScoresHTML(), getRoundTitle());
+}
+
+function finaleReveal(i){
+  const m = game.finale;
+  if(!m.revealedAnswers[m.qIdx]) m.revealedAnswers[m.qIdx]=[];
+  m.revealedAnswers[m.qIdx].push(i);
+  const otherIdx = m.finalistIdxs.find(idx=>idx!==m.currentPlayer);
+  game.players[otherIdx].seconds = Math.max(0, game.players[otherIdx].seconds-20);
+  toast('-20s voor '+game.players[otherIdx].name,'success');
+  renderFinaleGame();
+  updateProjection(null, projScoresHTML(), null);
+}
+
+function finalePassToOther(){
+  const m=game.finale;
+  m.currentPlayer=m.finalistIdxs.find(i=>i!==m.currentPlayer);
+  renderFinaleGame();
+}
+
+function finaleNext(){
+  game.finale.qIdx++;
+  game.finale.currentPlayer=getPlayerWithLeast(game.finale.finalistIdxs);
+  renderGame();
+}
+
+// ── EINDE ──
+function renderEndGame(){
+  stopTimer();
+  const finIdxs=game.finale.finalistIdxs||[];
+  const elimIdx=game.finale.eliminatedIdx;
+  const finSorted=finIdxs.map(i=>game.players[i]).sort((a,b)=>b.seconds-a.seconds);
+  const winner=finSorted[0];
+  const second=finSorted[1];
+  const third=elimIdx>=0?game.players[elimIdx]:null;
+
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
+    <div style="text-align:center;max-width:600px;margin:0 auto;padding:1rem">
+      <div style="font-size:3rem;margin-bottom:1rem">🏆</div>
+      <p style="font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--cream-dim);font-weight:300;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem">De Slimste Mens ter Wereld is</p>
+      <h1 style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:${winner.color};line-height:1;margin-bottom:2.5rem;text-shadow:0 0 30px ${winner.color}55">${esc(winner.name)}</h1>
+
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:2rem">
+        <div style="display:flex;align-items:center;gap:1rem;background:var(--navy-card);border:1px solid var(--border-bright);border-radius:10px;padding:1rem 1.5rem">
+          <span style="font-size:1.8rem">🥈</span>
+          <span style="flex:1;text-align:left;font-size:1.1rem;font-weight:500;color:${second.color}">${esc(second.name)}</span>
+          <span style="font-size:0.8rem;color:var(--muted)">2de finalist</span>
+        </div>
+        ${third?`<div style="display:flex;align-items:center;gap:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;opacity:0.75">
+          <span style="font-size:1.8rem">🥉</span>
+          <span style="flex:1;text-align:left;font-size:1.1rem;font-weight:500;color:${third.color}">${esc(third.name)}</span>
+          <span style="font-size:0.8rem;color:var(--muted)">uitgeschakeld voor finale</span>
+        </div>`:''}
+      </div>
+
+      <div class="game-controls">
+        <button class="btn btn-outline" onclick="showPage('pageHome')">← Naar home</button>
+        <button class="btn btn-gold" onclick="startGameSetup()">↺ Opnieuw spelen</button>
+      </div>
+    </div>
+  `;
+
+  updateProjection(`
+    <div style="text-align:center;width:100%;padding:1rem 0">
+      <div style="font-size:3.5rem;margin-bottom:0.75rem">🏆</div>
+      <p style="font-size:0.9rem;color:#aaa;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem">De Slimste Mens ter Wereld is</p>
+      <div style="font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;color:${winner.color};line-height:1;margin-bottom:2rem;text-shadow:0 0 40px ${winner.color}66">${esc(winner.name)}</div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:500px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:0.85rem 1.5rem">
+          <span style="font-size:1.5rem">🥈</span>
+          <span style="flex:1;text-align:left;font-size:1.2rem;font-weight:500;color:${second.color}">${esc(second.name)}</span>
+          <span style="font-size:0.8rem;color:#888">2de finalist</span>
+        </div>
+        ${third?`<div style="display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.85rem 1.5rem;opacity:0.7">
+          <span style="font-size:1.5rem">🥉</span>
+          <span style="flex:1;text-align:left;font-size:1.2rem;font-weight:500;color:${third.color}">${esc(third.name)}</span>
+          <span style="font-size:0.8rem;color:#888">uitgeschakeld voor finale</span>
+        </div>`:''}
+      </div>
+    </div>
+  `, projScoresHTML(), 'Eindstand');
+}
+
+// ── HELPERS ──
+function renderMedia(url, type){
+  if(!url||!url.trim()) return '';
+  const u = url.trim();
+  // YouTube: support watch, youtu.be, shorts, embed
+  const ytMatch = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if(ytMatch){
+    const vid = ytMatch[1];
+    return `<iframe src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:220px;border:none;border-radius:8px;display:block"></iframe>`;
+  }
+  // Audio file
+  if(type==='audio' || u.match(/\.(mp3|wav|ogg|m4a)(\?|$)/i)){
+    return `<audio controls style="width:100%;margin:0.5rem 0"><source src="${u}"><p style="color:var(--muted);font-size:0.8rem">Audio kan niet worden afgespeeld: <a href="${u}" target="_blank" style="color:var(--gold)">${u}</a></p></audio>`;
+  }
+  // Video file
+  return `<video controls style="width:100%;border-radius:8px;display:block"><source src="${u}"><p style="color:var(--muted);font-size:0.8rem">Video kan niet worden afgespeeld: <a href="${u}" target="_blank" style="color:var(--gold)">${u}</a></p></video>`;
+}
+
+// Return image src — direct on GitHub Pages, no proxy needed
+function proxyImg(u){
+  if(!u||!u.trim()) return '';
+  return u.trim();
+}
+
+// Safe URL for non-image src attributes
+function safeUrl(u){ return (u||'').trim().replace(/"/g,'%22').replace(/'/g,'%27'); }
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show'+(type?' toast-'+type:'');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// Init
+showPage('pageHome');
+</script>
+</body>
+</html>
