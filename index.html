@@ -945,7 +945,8 @@ function applyNextPhase(){
     if(setup.finaleSetup){ showSecondAdjust(); return; }
   }
   renderGame();
-  if(phase!=='r2') startTimer();
+  // r2: timer starts on theme selection; r5: timer starts when host clicks start per fragment
+  if(phase!=='r2' && phase!=='r5') startTimer();
 }
 
 function showSecondAdjust(){
@@ -1403,7 +1404,14 @@ function renderR3Game(){
   const p=game.players[m.currentPlayer];
   const q=quiz.r3[m.fragIdx];
   const revealed=m.revealed[m.fragIdx]||[];
+  // Randomize clues but keep group info — shuffle per fragIdx using seeded-ish approach
   const allClues=q.answers.flatMap((ans,gi)=>(ans.clues||['','','','']).map(c=>({text:c,group:gi})));
+  // Shuffle using fragIdx as seed so same puzzle always gives same shuffle within a session
+  const shuffled=[...allClues];
+  for(let i=shuffled.length-1;i>0;i--){
+    const j=Math.floor((Math.sin(i*9301+m.fragIdx*49297)*233280+233280)%1*(i+1));
+    [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];
+  }
   const hasNext=po.idx<2;
   const gm=document.getElementById('gameMain');
   gm.innerHTML=`
@@ -1414,7 +1422,7 @@ function renderR3Game(){
       <div class="game-question-number">Puzzel ${m.fragIdx+1} van ${quiz.r3.length} · Groepeer de 12 hokjes in ${q.answers.length} groepen van 4</div>
     </div>
     <div class="puzzle-grid">
-      ${allClues.map(c=>`<div class="puzzle-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
+      ${shuffled.map(c=>`<div class="puzzle-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
     </div>
     <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;width:100%">
       <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem">Oplossingen (alleen host):</div>
@@ -1434,7 +1442,7 @@ function renderR3Game(){
   updateProjection(`
     <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong> · Puzzel ${m.fragIdx+1}</div>
     <div class="p-puzzle">
-      ${allClues.map(c=>`<div class="p-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
+      ${shuffled.map(c=>`<div class="p-cell ${revealed.includes(c.group)?'matched':''}">${esc(c.text||'...')}</div>`).join('')}
     </div>
     <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
       ${q.answers.map((ans,gi)=>revealed.includes(gi)?`<div style="background:rgba(26,122,74,0.2);border:1px solid var(--green);border-radius:6px;padding:0.4rem 1rem;font-size:0.9rem;color:#4ade80">✓ ${esc(ans.solution)}</div>`:'')}
@@ -1669,25 +1677,33 @@ function renderR5Game(){
     showIntermission('finale',{finaleSetup:true});
     return;
   }
-  // Rotate start per fragment: fragIdx 0 → least, fragIdx 1 → shift 1, fragIdx 2 → shift 2
+  // Rotate start per fragment
   if(m.lastFragIdx!==m.fragIdx){
+    stopTimer(); // stop timer when new fragment loads
     const least=getPlayerWithLeast();
     const offset=m.fragIdx%3;
     m.currentPlayer=(least+offset)%3;
     m.lastFragIdx=m.fragIdx;
+    m.timerStarted=false; // timer not yet started for this fragment
   }
   const p=game.players[m.currentPlayer];
-  const q = quiz.r5[m.fragIdx];
-  const revealed = m.revealed[m.fragIdx]||[];
-  const pts = [10,20,30,40,50];
-  const gm = document.getElementById('gameMain');
-  gm.innerHTML = `
+  const q=quiz.r5[m.fragIdx];
+  const revealed=m.revealed[m.fragIdx]||[];
+  const pts=[10,20,30,40,50];
+  const timerStarted=m.timerStarted||false;
+  const gm=document.getElementById('gameMain');
+  gm.innerHTML=`
     <div class="active-player-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
     <div class="game-question-box">
       <div class="game-question-number">Fragment ${m.fragIdx+1} van ${quiz.r5.length} · Collectief Geheugen</div>
       ${q.videoUrl?`<div class="game-question-media">${renderMedia(q.videoUrl,'video')}</div>`:''}
       <div class="game-question-text">${esc(q.theme)||'Thema niet ingevuld'}</div>
     </div>
+    ${!timerStarted?`
+    <div style="background:rgba(201,168,76,0.08);border:2px solid var(--gold);border-radius:10px;padding:1.25rem;text-align:center;margin-bottom:1rem;width:100%">
+      <div style="font-size:0.85rem;color:var(--cream-dim);margin-bottom:0.75rem">⏸ Timer staat stil — bekijk het fragment en start dan de timer</div>
+      <button class="btn btn-gold" onclick="r5StartTimer()">▶ Start timer & beantwoorden</button>
+    </div>`:`
     <div class="answers-panel">
       ${q.answers.map((a,i)=>`<div class="answer-slot ${revealed.includes(i)?'revealed':''}">
         <div class="answer-slot-num">${revealed.includes(i)?'+'+pts[i]+'s':i+1}</div>
@@ -1704,7 +1720,7 @@ function renderR5Game(){
       ${q.answers.map((a,i)=>revealed.includes(i)?'':`<button class="btn btn-green btn-sm" onclick="r5Reveal(${i})">✓ ${esc(a)}</button>`).join('')}
       <button class="btn btn-ghost btn-sm" onclick="r5NextPlayer()">→ Andere kandidaat</button>
       <button class="btn btn-outline btn-sm" onclick="r5Next()">Volgend fragment →</button>
-    </div>
+    </div>`}
     <div style="margin-top:1rem;background:var(--navy-card);border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;width:100%">
       <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.08em">Tussenstand</div>
       ${game.players.map(pl=>`<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.9rem;border-bottom:1px solid var(--border)">
@@ -1712,19 +1728,26 @@ function renderR5Game(){
       </div>`).join('')}
     </div>
   `;
+  // Projection: show video/theme, hide answers until timer started
   updateProjection(`
-    <div class="p-banner">Aan de beurt: <strong style="color:${p.color}">${esc(p.name)}</strong></div>
+    <div class="p-banner">Fragment ${m.fragIdx+1} · Collectief Geheugen${!timerStarted?' · <em style="color:var(--muted)">Bekijk het fragment...</em>':' · Aan de beurt: <strong style="color:'+p.color+'">'+esc(p.name)+'</strong>'}</div>
     <div class="pq-box">
       <div class="pq-num">Fragment ${m.fragIdx+1} · Collectief Geheugen</div>
       ${q.videoUrl?`<div class="pq-media">${renderMedia(q.videoUrl,'video')}</div>`:''}
       <div class="pq-text">${esc(q.theme)}</div>
     </div>
-    <div class="p-answers">
+    ${timerStarted?`<div class="p-answers">
       ${q.answers.map((a,i)=>`<div class="p-ans ${revealed.includes(i)?'revealed':''}">
         <div class="p-ans-num">${revealed.includes(i)?'+'+pts[i]+'s':i+1}</div>
         <div class="p-ans-text">${revealed.includes(i)?esc(a):'???'}</div>
       </div>`).join('')}
-    </div>`, projScoresHTML(), getRoundTitle());
+    </div>`:''}`,projScoresHTML(),getRoundTitle());
+}
+
+function r5StartTimer(){
+  game.r5.timerStarted=true;
+  startTimer();
+  renderR5Game();
 }
 
 function r5Reveal(i){
@@ -1739,7 +1762,8 @@ function r5Reveal(i){
 function r5NextPlayer(){ game.r5.currentPlayer=(game.r5.currentPlayer+1)%3; renderR5Game(); }
 function r5Next(){
   game.r5.fragIdx++;
-  // currentPlayer will be set by renderR5Game based on rotation
+  game.r5.timerStarted=false;
+  stopTimer();
   renderR5Game();
 }
 
