@@ -556,7 +556,7 @@ function renderR3Card(q,i){
         </div>
         <label class="form-label">4 aanwijzingen</label>
         <div class="puzzle-grid-builder">
-          ${(ans.clues||['','','','']).map((c,k)=>`<input class="form-input" value="${esc(c)}" oninput="quiz.r3[${i}].answers[${j}].clues=${JSON.stringify(ans.clues||['','','',''])};quiz.r3[${i}].answers[${j}].clues[${k}]=this.value" placeholder="Aanwijzing ${k+1}">`).join('')}
+          ${(ans.clues||['','','','']).map((c,k)=>`<input class="form-input" value="${esc(c)}" oninput="if(!Array.isArray(quiz.r3[${i}].answers[${j}].clues))quiz.r3[${i}].answers[${j}].clues=['','','',''];quiz.r3[${i}].answers[${j}].clues[${k}]=this.value" placeholder="Aanwijzing ${k+1}">`).join('')}
         </div>
       </div>`).join('')}
     </div>
